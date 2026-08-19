@@ -24,6 +24,7 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
             audioRef.current = new Audio('/pretty.mp3');
             audioRef.current.loop = true;
             audioRef.current.volume = 0.8;
+            audioRef.current.preload = 'auto';
             // Cross-browser persistence hint
             (audioRef.current as unknown as { preservesPitch: boolean }).preservesPitch = true;
         }
@@ -32,8 +33,8 @@ export function MusicProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         if (isPlaying && audioRef.current) {
             audioRef.current.play().catch(e => {
-                console.log("Autoplay prevented:", e);
-                setIsPlaying(false);
+                console.log("Autoplay check:", e);
+                // Don't set isPlaying(false) here, as it might just be waiting for interaction
             });
         }
     }, [isPlaying]);

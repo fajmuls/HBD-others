@@ -112,20 +112,14 @@ function buildItems(pool: ImageItem[], seg: number): ItemDef[] {
 
   const usedImages = Array.from({ length: totalSlots }, (_, i) => normalizedImages[i % normalizedImages.length]);
 
-  for (let i = 1; i < usedImages.length; i++) {
-    if (usedImages[i].src === usedImages[i - 1].src) {
-      for (let j = i + 1; j < usedImages.length; j++) {
-        if (usedImages[j].src !== usedImages[i].src) {
-          const tmp = usedImages[i];
-          usedImages[i] = usedImages[j];
-          usedImages[j] = tmp;
-          break;
-        }
-      }
-    }
+  // Fisher-Yates shuffle for variety
+  for (let i = usedImages.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [usedImages[i], usedImages[j]] = [usedImages[j], usedImages[i]];
   }
 
-  return coords.map((c, i) => ({ message: usedImages[i].message,
+  return coords.map((c, i) => ({ 
+    message: usedImages[i].message,
     ...c,
     src: usedImages[i].src,
     alt: usedImages[i].alt
@@ -519,16 +513,6 @@ export default function DomeGallery({
       }
 
       overlay.remove();
-      viewerRef.current?.querySelectorAll('.romantic-label').forEach(label => {
-        (label as HTMLElement).style.opacity = '0';
-        const isMobile = window.innerWidth <= 768;
-        if (isMobile) {
-          (label as HTMLElement).style.transform = (label as HTMLElement).classList.contains('label-left') ? 'translateY(-20px)' : 'translateY(20px)';
-        } else {
-          (label as HTMLElement).style.transform = (label as HTMLElement).classList.contains('label-left') ? 'translateX(-20px)' : 'translateX(20px)';
-        }
-        setTimeout(() => label.remove(), enlargeTransitionMs);
-      });
       rootRef.current!.appendChild(animatingOverlay);
 
       void animatingOverlay.getBoundingClientRect();
@@ -647,62 +631,12 @@ export default function DomeGallery({
     overlay.style.cssText = `position:absolute; left:${frameR.left - mainR.left}px; top:${frameR.top - mainR.top}px; width:${frameR.width}px; height:${frameR.height}px; opacity:0; z-index:30; will-change:transform,opacity; transform-origin:top left; transition:transform ${enlargeTransitionMs}ms ease, opacity ${enlargeTransitionMs}ms ease; border-radius:${openedImageBorderRadius}; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.35);`;
     const rawSrc = parent.dataset.src || (el.querySelector('img') as HTMLImageElement)?.src || '';
     const rawAlt = parent.dataset.alt || (el.querySelector('img') as HTMLImageElement)?.alt || '';
-    const rawMessage = parent.dataset.message || '';
-
-    overlay.style.perspective = '1000px';
-
-    const flipper = document.createElement('div');
-    flipper.style.cssText = `position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);`;
-
-    const imgContainer = document.createElement('div');
-    imgContainer.style.cssText = `position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;`;
 
     const img = document.createElement('img');
     img.src = rawSrc;
     img.alt = rawAlt;
     img.style.cssText = `width:100%; height:100%; object-fit:cover; filter:${grayscale ? 'grayscale(1)' : 'none'}; border-radius:${openedImageBorderRadius};`;
-    imgContainer.appendChild(img);
-
-    const backContainer = document.createElement('div');
-    backContainer.style.cssText = `position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: rotateY(180deg); background: #fdfbf7; border-radius:${openedImageBorderRadius}; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 4px solid #fff; box-shadow: inset 0 0 20px rgba(0,0,0,0.05);`;
-    
-    // Add texture
-    const texture = document.createElement('div');
-    texture.style.cssText = `position: absolute; inset: 0; opacity: 0.3; pointer-events: none; background-image: url('https://www.transparenttextures.com/patterns/paper.png');`;
-    backContainer.appendChild(texture);
-
-    const msgElement = document.createElement('p');
-    msgElement.style.cssText = `color: #4a3b32; font-family: 'Playfair Display', serif; font-size: 1.25rem; line-height: 1.6; font-style: italic; z-index: 10; font-weight: 500;`;
-    msgElement.innerText = rawMessage || "Sebuah kenangan indah...";
-    backContainer.appendChild(msgElement);
-
-    const tapHint = document.createElement('div');
-    tapHint.style.cssText = `position: absolute; bottom: 20px; font-size: 0.8rem; color: #a0938a; font-family: sans-serif; letter-spacing: 1px; uppercase; z-index: 10; font-weight: 600;`;
-    tapHint.innerText = 'TAP TO FLIP BACK';
-    backContainer.appendChild(tapHint);
-
-    flipper.appendChild(imgContainer);
-    flipper.appendChild(backContainer);
-    overlay.appendChild(flipper);
-
-    let isFlipped = false;
-    overlay.addEventListener('click', (e) => {
-        e.stopPropagation(); // prevent closing
-        isFlipped = !isFlipped;
-        flipper.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
-        
-        // Play flip sound
-        try {
-          const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
-          audio.volume = 0.2;
-          audio.play().catch(() => {});
-        } catch(e) {}
-
-        // Hide romantic labels when flipped
-        viewerRef.current?.querySelectorAll('.romantic-label').forEach(label => {
-            (label as HTMLElement).style.opacity = isFlipped ? '0' : '1';
-        });
-    });
+    overlay.appendChild(img);
 
     viewerRef.current!.appendChild(overlay);
     const tx0 = tileR.left - frameR.left;
@@ -773,20 +707,6 @@ export default function DomeGallery({
       audio.volume = 0.3;
       audio.play().catch(() => {});
     } catch(e) {}
-
-    const checkAndShowLabels = () => {
-      if (rootRef.current?.getAttribute('data-enlarging') === 'true') {
-        labelLeft.style.opacity = '1';
-        labelLeft.style.transform = 'translate(0, 0)';
-        labelRight.style.opacity = '1';
-        labelRight.style.transform = 'translate(0, 0)';
-      } else {
-        labelLeft.remove();
-        labelRight.remove();
-      }
-    };
-
-    setTimeout(checkAndShowLabels, enlargeTransitionMs);
   };
 
   useEffect(() => {
@@ -851,18 +771,9 @@ export default function DomeGallery({
     
     @media (max-width: 768px) {
       .viewer-frame {
-        width: 90vw !important;
-        height: auto !important;
-        max-height: 70vh !important;
-        aspect-ratio: auto !important;
-      }
-      .enlarge {
-        width: 100% !important;
-        height: 100% !important;
-        left: 0 !important;
-        top: 0 !important;
-        position: relative !important;
-        transform: none !important;
+        width: 85vw !important;
+        height: 85vw !important;
+        max-height: 80vh !important;
       }
     }
     

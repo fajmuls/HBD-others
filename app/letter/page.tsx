@@ -55,7 +55,7 @@ const pages = [
     title: "Harapan Kita Bersama",
     content: "terussss bagian ini nih yang paling ngena di hati (asekkk):\n\n\"Bila di depan nanti banyak cobaan kisah cinta kita\nJangan cepat menyerah\nKau punya aku, ku punya kamu...\"\n\nini sih harapan aku banget buat kita. nanti di depan pasti bakal ada aja ujian atau capeknya, tapi inget yaa... kita jangan gampang nyerah. kamuu tetep punya aku, dan aku punya kamu buat saling jagain bareng-bareng terus yaaaaa <33 !!",
     polaroids: [
-      { src: "/1.jpeg", position: "bottom-10 left-[-10px]", rotation: "-rotate-[8deg]" }
+      { src: "/6.jpeg", position: "bottom-10 left-[-10px]", rotation: "-rotate-[8deg]" }
     ]
   }
 ];

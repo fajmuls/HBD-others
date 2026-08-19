@@ -35,7 +35,7 @@ const BackgroundHearts = () => {
 // --- Step 1: Love Mode ---
 const LoveModeStep = ({ onComplete }: { onComplete: () => void }) => {
     const [isOn, setIsOn] = useState(false);
-    const { setIsPlaying, playSFX } = useMusic();
+    const { playSFX } = useMusic();
 
     const playAudio = (path: string) => {
         const fallbacks: Record<string, string> = {
@@ -48,11 +48,10 @@ const LoveModeStep = ({ onComplete }: { onComplete: () => void }) => {
     useEffect(() => {
         if (isOn) {
             playAudio('love-mode.mp3');
-            setIsPlaying(true); // Start background music as soon as they turn this on
             const timer = setTimeout(() => onComplete(), 3000);
             return () => clearTimeout(timer);
         }
-    }, [isOn, onComplete, setIsPlaying]);
+    }, [isOn, onComplete]);
 
     return (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }} className="flex flex-col items-center justify-center relative z-10">
@@ -275,7 +274,7 @@ const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
 
 export default function InteractionFlow({ onFlowComplete }: { onFlowComplete: () => void }) {
     const [step, setStep] = useState(1);
-    const { setIsPlaying, playSFX } = useMusic();
+    const { setIsPlaying } = useMusic();
 
     const handleFlowComplete = () => {
         setIsPlaying(true);
