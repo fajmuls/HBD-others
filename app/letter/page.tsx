@@ -1,18 +1,14 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 
 const playPageFlip = () => {
     try {
-        const audio = new Audio('/sfx/page-flip.mp3');
+        const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
         audio.volume = 0.5;
-        audio.play().catch(e => {
-            const fallback = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
-            fallback.volume = 0.3;
-            fallback.play().catch(() => {});
-        });
+        audio.play().catch(() => {});
     } catch (e) {
         // Ignore
     }
@@ -52,17 +48,22 @@ const pages = [
 
 export default function LetterPage() {
   const [currentPage, setCurrentPage] = useState(0);
+  const constraintsRef = useRef(null);
 
   const next = () => {
     try {
-      new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3').play().catch(() => {});
+      const click = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+      click.volume = 0.5;
+      click.play().catch(() => {});
     } catch { }
     playPageFlip();
     setCurrentPage(p => Math.min(pages.length - 1, p + 1));
   };
   const prev = () => {
     try {
-      new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3').play().catch(() => {});
+      const click = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+      click.volume = 0.5;
+      click.play().catch(() => {});
     } catch { }
     playPageFlip();
     setCurrentPage(p => Math.max(0, p - 1));
@@ -81,11 +82,12 @@ export default function LetterPage() {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
+            ref={constraintsRef}
             initial={{ rotateY: 90, opacity: 0, transformOrigin: 'left' }}
             animate={{ rotateY: 0, opacity: 1 }}
             exit={{ rotateY: -90, opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="bg-[#fefaf3] text-[#333] p-6 md:p-12 rounded-r-2xl rounded-l-md shadow-2xl min-h-[400px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-visible flex flex-col"
+            className="bg-[#fefaf3] text-[#333] p-6 md:p-12 rounded-r-2xl rounded-l-md shadow-2xl min-h-[400px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-hidden flex flex-col"
           >
             {/* Texture kertas ringan */}
             <div className="absolute inset-0 opacity-15 pointer-events-none" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/paper.png')" }} />
@@ -98,16 +100,18 @@ export default function LetterPage() {
                 {pages[currentPage].content}
             </p>
             
-            {/* Scattered Polaroids - Improved Scaling */}
+            {/* Scattered Polaroids - Draggable */}
             {pages[currentPage].polaroids?.map((polaroid, idx) => (
               <motion.div
-                key={polaroid.src + currentPage}
+                key={polaroid.src + currentPage + idx}
+                drag
+                dragConstraints={constraintsRef}
                 initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
                 animate={{ opacity: 1, scale: 1, rotate: polaroid.rotation.includes('-') ? -5 : 5 }}
                 transition={{ delay: 0.4 + (idx * 0.2), type: 'spring' }}
-                className={`absolute ${polaroid.position} w-24 md:w-40 bg-white p-1.5 pb-6 md:p-3 md:pb-10 shadow-2xl border border-black/5 z-20 pointer-events-none`}
+                className={`absolute ${polaroid.position} w-24 md:w-40 bg-white p-1.5 pb-6 md:p-3 md:pb-10 shadow-2xl border border-black/5 z-20 cursor-grab active:cursor-grabbing overflow-visible`}
               >
-                <div className="w-full aspect-square bg-white overflow-hidden relative border border-black/5">
+                <div className="w-full aspect-square bg-white overflow-hidden relative border border-black/5 pointer-events-none">
                   <img src={polaroid.src} alt="Memory" className="absolute inset-0 w-full h-full object-cover transition-all" />
                 </div>
               </motion.div>

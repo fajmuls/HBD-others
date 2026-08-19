@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X, Circle } from 'lucide-react';
+import { useMusic } from './MusicProvider';
 
 const playAudio = (path: string) => {
     try {
@@ -10,7 +11,8 @@ const playAudio = (path: string) => {
             'click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
             'tictactoe-click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
             'tictactoe-win.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3',
-            'love-mode.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'
+            'love-mode.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3',
+            'typing.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
         };
         const audio = new Audio(`/sfx/${path}`);
         audio.volume = 0.5;
@@ -21,7 +23,7 @@ const playAudio = (path: string) => {
                 fb.play().catch(() => {});
             }
         });
-    } catch (e) {
+    } catch {
         // Safe to ignore
     }
 };
@@ -56,14 +58,16 @@ const BackgroundHearts = () => {
 // --- Step 1: Love Mode ---
 const LoveModeStep = ({ onComplete }: { onComplete: () => void }) => {
     const [isOn, setIsOn] = useState(false);
+    const { setIsPlaying } = useMusic();
 
     useEffect(() => {
         if (isOn) {
             playAudio('love-mode.mp3');
+            setIsPlaying(true); // Start background music as soon as they turn this on
             const timer = setTimeout(() => onComplete(), 3000);
             return () => clearTimeout(timer);
         }
-    }, [isOn, onComplete]);
+    }, [isOn, onComplete, setIsPlaying]);
 
     return (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }} className="flex flex-col items-center justify-center relative z-10">
@@ -168,7 +172,7 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
     );
 };
 
-// --- Step 3: Love Meter (Heart Fill) ---
+// --- Step 3: Love Meter ---
 const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
     const [progress, setProgress] = useState(0);
 
@@ -177,11 +181,10 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
             setProgress(prev => {
                 if (prev >= 100) { 
                     clearInterval(interval); 
-                    playAudio('tictactoe-win.mp3'); // Completion sound
+                    playAudio('tictactoe-win.mp3');
                     setTimeout(() => onComplete(), 2000); 
                     return 100; 
                 }
-                // Play a subtle heartbeat sound at intervals
                 if (prev % 20 === 0) playAudio('tictactoe-click.mp3');
                 return prev + 1;
             });
@@ -192,46 +195,27 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center space-y-8 md:space-y-12 w-full max-w-sm px-6 relative z-10">
             <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
-                {/* Background Heart (Empty) */}
                 <Heart className="absolute w-full h-full text-white/5" fill="currentColor" strokeWidth={1} />
-                
-                {/* Filling Heart */}
                 <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(${100 - progress}% 0 0 0)` }}>
-                    <motion.div 
-                        animate={{ scale: [1, 1.05, 1] }} 
-                        transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
-                    >
+                    <motion.div animate={{ scale: [1, 1.05, 1] }} transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}>
                         <Heart className="w-48 h-48 md:w-64 md:h-64 text-red-500 fill-red-500 filter drop-shadow-[0_0_20px_rgba(239,68,68,0.4)]" />
                     </motion.div>
                 </div>
-
-                {/* Percentage Text */}
                 <div className="z-20 flex flex-col items-center">
-                    <motion.div 
-                        key={progress}
-                        initial={{ scale: 0.8, opacity: 0 }} 
-                        animate={{ scale: 1, opacity: 1 }}
-                        className="text-3xl md:text-5xl font-black text-white font-mono tracking-tighter"
-                    >
+                    <motion.div key={progress} initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-3xl md:text-5xl font-black text-white font-mono tracking-tighter">
                         {progress}<span className="text-red-400 text-xl md:text-2xl">%</span>
                     </motion.div>
                 </div>
             </div>
-
             <div className="w-full space-y-3 px-4">
                 <div className="flex justify-between text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/30">
                     <span>Intensity</span>
                     <span>{progress === 100 ? "MAXIMUM" : "CALCULATING..."}</span>
                 </div>
                 <div className="w-full h-1 md:h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
-                    <motion.div 
-                        className="h-full bg-gradient-to-r from-red-600 via-pink-500 to-red-600" 
-                        animate={{ width: `${progress}%` }} 
-                        transition={{ duration: 0.1 }}
-                    />
+                    <motion.div className="h-full bg-gradient-to-r from-red-600 via-pink-500 to-red-600" animate={{ width: `${progress}%` }} transition={{ duration: 0.1 }} />
                 </div>
             </div>
-            
             <p className="text-xs md:text-sm text-white/40 font-playfair italic text-center animate-pulse px-6 leading-relaxed">
                 &quot;My heart beats faster when I&apos;m with you...&quot;
             </p>
@@ -249,14 +233,19 @@ const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
         let timer: NodeJS.Timeout;
         if (!isDeleting && displayedText !== text) {
             timer = setTimeout(() => {
-                setDisplayedText(text.slice(0, displayedText.length + 1));
-            }, 150);
+                const nextChar = text.slice(0, displayedText.length + 1);
+                setDisplayedText(nextChar);
+                // Play typing sound on each character
+                if (nextChar.length > displayedText.length) {
+                    playAudio('typing.mp3');
+                }
+            }, 100); // Slightly faster typing for better feel
         } else if (!isDeleting && displayedText === text) {
             timer = setTimeout(() => setIsDeleting(true), 2500);
         } else if (isDeleting && displayedText !== "") {
             timer = setTimeout(() => {
                 setDisplayedText(text.slice(0, displayedText.length - 1));
-            }, 80);
+            }, 50);
         } else if (isDeleting && displayedText === "") {
             onComplete();
         }
@@ -275,6 +264,12 @@ const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
 
 export default function InteractionFlow({ onFlowComplete }: { onFlowComplete: () => void }) {
     const [step, setStep] = useState(1);
+    const { setIsPlaying } = useMusic();
+
+    const handleFlowComplete = () => {
+        setIsPlaying(true);
+        onFlowComplete();
+    };
 
     return (
         <div className="fixed inset-0 z-50 bg-[#060010] flex items-center justify-center overflow-hidden">
@@ -286,7 +281,7 @@ export default function InteractionFlow({ onFlowComplete }: { onFlowComplete: ()
                 {step === 1 && <LoveModeStep key="step1" onComplete={() => setStep(2)} />}
                 {step === 2 && <TicTacToeStep key="step2" onComplete={() => setStep(3)} />}
                 {step === 3 && <LoveMeterStep key="step3" onComplete={() => setStep(4)} />}
-                {step === 4 && <TypewriterStep key="step4" onComplete={() => onFlowComplete()} />}
+                {step === 4 && <TypewriterStep key="step4" onComplete={handleFlowComplete} />}
             </AnimatePresence>
 
             <div className="absolute -top-24 -left-24 w-96 h-96 bg-red-900/20 blur-[100px] rounded-full" />

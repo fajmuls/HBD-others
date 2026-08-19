@@ -41,7 +41,6 @@ export default function Home() {
         <InteractionFlow onFlowComplete={handleFlowComplete} />
       ) : (
         <>
-          <audio id="bg-music" src="/pretty.mp3" autoPlay loop className="hidden" />
           <DomeGallery
             images={userImages}
             fit={0.8}

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Navigation from '@/components/Navigation';
@@ -64,18 +64,15 @@ export default function CakePage() {
     setBlown(true);
     
     try {
-      const audio = new Audio('/sfx/blow.mp3');
-      audio.volume = 0.6;
-      audio.play().catch(() => {
-        const fallback = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
-        fallback.volume = 0.3;
-        fallback.play().catch(() => {});
-      });
+      // Independent Audio objects to prevent ducking or interference
+      const blowSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
+      blowSfx.volume = 1.0; 
+      blowSfx.play().catch(() => {});
 
-      // Play Happy Birthday music (short)
-      const hbd = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_731454c0e6.mp3?filename=happy-birthday-155461.mp3');
-      hbd.volume = 0.5;
-      hbd.play().catch(() => {});
+      // Short Happy Birthday celebration
+      const hbdSfx = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_731454c0e6.mp3?filename=happy-birthday-155461.mp3');
+      hbdSfx.volume = 0.8;
+      hbdSfx.play().catch(() => {});
     } catch { }
 
     // Confetti effect
@@ -116,76 +113,134 @@ export default function CakePage() {
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10 flex flex-col items-center justify-center w-full max-w-2xl"
       >
-        <div className="mb-8 md:mb-16 text-center space-y-2 md:space-y-4">
-          <h1 className="text-3xl md:text-5xl font-playfair text-white drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]">
+        <div className="mb-8 md:mb-12 text-center space-y-2 md:space-y-4">
+          <h1 className="text-4xl md:text-6xl font-playfair text-white drop-shadow-[0_0_20px_rgba(239,68,68,0.6)] font-bold italic">
             {blown ? "Happy Birthday! ✨" : "Make a Wish..."}
           </h1>
           <p className="text-white/60 font-serif italic text-base md:text-xl">
-            {blown ? "Semoga semua harapanmu terkabul." : (micEnabled ? "Tiup lilinnya dari mic perangkatmu!" : "Ketuk lilinnya untuk meniup!")}
+            {blown ? "Semoga semua harapanmu terkabul, Kak Arey!" : (micEnabled ? "Tiup lilinnya dari mic perangkatmu!" : "Ketuk lilinnya untuk meniup!")}
           </p>
         </div>
 
-        {/* The Cake - Responsive Scale */}
-        <div className="relative cursor-pointer scale-[0.8] md:scale-110 group" onClick={() => {
+        {/* The Cake - Upgraded Visuals */}
+        <div className="relative cursor-pointer scale-[0.7] sm:scale-[0.9] md:scale-110 group perspective-[1000px]" onClick={() => {
           if (!blown) {
             try {
-              new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3').play().catch(() => {});
+              const click = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+              click.volume = 0.5;
+              click.play().catch(() => {});
             } catch(e) {}
             handleBlowOut();
           }
         }}>
-          <div className="absolute inset-0 bg-red-500/20 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="absolute inset-0 bg-red-500/20 blur-[120px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
           
-          <svg width="320" height="420" viewBox="0 0 320 420" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-2xl overflow-visible relative z-10">
-            {/* Plate */}
-            <ellipse cx="160" cy="360" rx="150" ry="35" fill="#2d1a1a" />
-            <ellipse cx="160" cy="355" rx="140" ry="30" fill="#3d2b2b" />
-
-            {/* Bottom Layer */}
-            <path d="M40 340 C40 375, 280 375, 280 340 L280 260 C280 295, 40 295, 40 260 Z" fill="#ff9999" />
-            <ellipse cx="160" cy="260" rx="120" ry="30" fill="#ffb3b3" />
+          <svg width="400" height="500" viewBox="0 0 400 500" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-2xl overflow-visible relative z-10 filter brightness-110">
+            {/* Plate shadow */}
+            <ellipse cx="200" cy="440" rx="160" ry="40" fill="black" opacity="0.4" />
             
-            {/* Middle Layer */}
-            <path d="M60 260 C60 290, 260 290, 260 260 L260 190 C260 220, 60 220, 60 190 Z" fill="#ff708a" />
-            <ellipse cx="160" cy="190" rx="100" ry="25" fill="#ff85a2" />
+            {/* Plate */}
+            <ellipse cx="200" cy="430" rx="170" ry="45" fill="url(#plateGradient)" />
+            <ellipse cx="200" cy="422" rx="150" ry="35" fill="#f0f0f0" />
+            
+            {/* Cake Base Layer */}
+            <path d="M60 410 C60 450, 340 450, 340 410 L340 300 C340 340, 60 340, 60 300 Z" fill="url(#baseLayerGradient)" />
+            <ellipse cx="200" cy="300" rx="140" ry="40" fill="#ffb3b3" />
+            
+            {/* Cake Middle Layer */}
+            <path d="M85 300 C85 335, 315 335, 315 300 L315 210 C315 245, 85 245, 85 210 Z" fill="url(#midLayerGradient)" />
+            <ellipse cx="200" cy="210" rx="115" ry="35" fill="#ff85a2" />
+            
+            {/* Cake Top Layer */}
+            <path d="M115 210 C115 240, 285 240, 285 210 L285 140 C285 170, 115 170, 115 140 Z" fill="url(#topLayerGradient)" />
+            <ellipse cx="200" cy="140" rx="85" ry="25" fill="#ffffff" />
 
-            {/* Top Layer */}
-            <path d="M85 190 C85 215, 235 215, 235 190 L235 130 C235 155, 85 155, 85 130 Z" fill="#fffaf0" />
-            <ellipse cx="160" cy="130" rx="75" ry="20" fill="#ffffff" />
+            {/* Icing Drips - Detailed */}
+            <path d="M115 140 Q135 185 155 140 Q175 195 200 140 Q225 190 255 140 Q270 170 285 140" fill="white" />
+            <path d="M85 210 Q115 255 145 210 Q175 270 210 210 Q245 260 285 210 Q300 240 315 210" fill="#ff85a2" opacity="0.8" />
 
-            {/* Premium Drips */}
-            <path d="M85 130 Q105 165 125 130 Q145 175 165 130 Q185 170 215 130 Q225 150 235 130" fill="#ffffff" />
-            <path d="M60 190 Q85 225 110 190 Q135 235 165 190 Q195 230 230 190 Q245 215 260 190" fill="#ff85a2" opacity="0.6" />
+            {/* Sprinkles */}
+            {[...Array(20)].map((_, i) => (
+                <circle key={`s1-${i}`} cx={100 + Math.random() * 200} cy={320 + Math.random() * 60} r="3" fill={['#ff4d4d', '#ffeb3b', '#4caf50', '#2196f3', '#e91e63'][i % 5]} opacity="0.7" />
+            ))}
+            {[...Array(15)].map((_, i) => (
+                <circle key={`s2-${i}`} cx={120 + Math.random() * 160} cy={220 + Math.random() * 50} r="2.5" fill={['#ff4d4d', '#ffeb3b', '#4caf50', '#2196f3', '#e91e63'][i % 5]} opacity="0.8" />
+            ))}
 
-            {/* Candles - Increased count and variety */}
+            {/* Strawberries / Decorations on top */}
             {[
-              { x: 120, y: 70, h: 45, color: "#ffccd5", delay: 0 },
-              { x: 140, y: 55, h: 55, color: "#ffb3c1", delay: 0.2 },
-              { x: 165, y: 50, h: 60, color: "#ffccd5", delay: 0.4 },
-              { x: 190, y: 60, h: 50, color: "#ffb3c1", delay: 0.1 },
-              { x: 210, y: 80, h: 40, color: "#ffccd5", delay: 0.3 }
+                { x: 160, y: 130 },
+                { x: 240, y: 130 },
+                { x: 200, y: 115 },
+                { x: 140, y: 150 },
+                { x: 260, y: 150 }
+            ].map((pos, i) => (
+                <g key={`deco-${i}`} transform={`translate(${pos.x}, ${pos.y})`}>
+                    <path d="M-10 0 Q 0 -15 10 0 Q 0 15 -10 0" fill="#e91e63" />
+                    <circle cx="0" cy="-2" r="1.5" fill="white" opacity="0.5" />
+                </g>
+            ))}
+
+            {/* Candles - Enhanced */}
+            {[
+              { x: 150, y: 70, h: 55, color: "url(#candle1)", delay: 0 },
+              { x: 175, y: 55, h: 65, color: "url(#candle2)", delay: 0.2 },
+              { x: 200, y: 50, h: 70, color: "url(#candle1)", delay: 0.4 },
+              { x: 225, y: 60, h: 60, color: "url(#candle2)", delay: 0.1 },
+              { x: 250, y: 80, h: 50, color: "url(#candle1)", delay: 0.3 }
             ].map((candle, i) => (
               <g key={i} transform={`translate(${candle.x}, ${candle.y})`}>
-                <rect x="0" y="20" width="10" height={candle.h} rx="2" fill={candle.color} />
-                <line x1="5" y1="20" x2="5" y2="15" stroke="#444" strokeWidth="1" />
+                <rect x="-5" y="20" width="12" height={candle.h} rx="3" fill={candle.color} stroke="rgba(0,0,0,0.1)" strokeWidth="1" />
+                <line x1="1" y1="20" x2="1" y2="12" stroke="#333" strokeWidth="1.5" />
                 <AnimatePresence>
                   {!blown && (
-                    <motion.path
+                    <motion.g
                       initial={{ scale: 1 }}
                       animate={{ 
-                        scale: [1, 1.2 + Math.random() * 0.2, 1], 
-                        rotate: [0, -5 + Math.random() * 10, 5 - Math.random() * 10, 0] 
+                        scale: [1, 1.25, 1], 
+                        rotate: [0, -5, 5, 0] 
                       }}
-                      transition={{ repeat: Infinity, duration: 0.4 + candle.delay }}
+                      transition={{ repeat: Infinity, duration: 0.4 + candle.delay, ease: "easeInOut" }}
                       exit={{ scale: 0, opacity: 0 }}
-                      d="M5 15 C 5 15, 0 10, 5 0 C 10 10, 5 15, 5 15 Z"
-                      fill="#ffaa00"
-                      className="drop-shadow-[0_0_12px_rgba(255,170,0,0.9)]"
-                    />
+                      className="origin-bottom"
+                    >
+                      {/* Inner Flame */}
+                      <path d="M1 12 C 1 12, -4 5, 1 -8 C 6 5, 1 12, 1 12 Z" fill="#ffcc00" className="drop-shadow-[0_0_15px_rgba(255,204,0,0.8)]" />
+                      {/* Outer Flame Glow */}
+                      <path d="M1 12 C 1 12, -7 2, 1 -12 C 9 2, 1 12, 1 12 Z" fill="#ff6600" opacity="0.4" />
+                    </motion.g>
                   )}
                 </AnimatePresence>
               </g>
             ))}
+
+            {/* Gradients */}
+            <defs>
+              <linearGradient id="plateGradient" x1="200" y1="430" x2="200" y2="475" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#e0e0e0" />
+                <stop offset="1" stopColor="#999999" />
+              </linearGradient>
+              <linearGradient id="baseLayerGradient" x1="200" y1="300" x2="200" y2="410" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#ffb3b3" />
+                <stop offset="1" stopColor="#ff8080" />
+              </linearGradient>
+              <linearGradient id="midLayerGradient" x1="200" y1="210" x2="200" y2="300" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#ff85a2" />
+                <stop offset="1" stopColor="#ff4d79" />
+              </linearGradient>
+              <linearGradient id="topLayerGradient" x1="200" y1="140" x2="200" y2="210" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#ffffff" />
+                <stop offset="1" stopColor="#f0f0f0" />
+              </linearGradient>
+              <linearGradient id="candle1" x1="0" y1="0" x2="10" y2="0">
+                <stop stopColor="#ffccd5" />
+                <stop offset="1" stopColor="#ff8095" />
+              </linearGradient>
+              <linearGradient id="candle2" x1="0" y1="0" x2="10" y2="0">
+                <stop stopColor="#ffb3c1" />
+                <stop offset="1" stopColor="#ff4d6d" />
+              </linearGradient>
+            </defs>
           </svg>
         </div>
 

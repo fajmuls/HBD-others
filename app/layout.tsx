@@ -30,6 +30,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { MusicProvider } from "@/components/MusicProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,7 +42,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${playfair.variable} antialiased`}
       >
-        {children}
+        <MusicProvider>
+          {children}
+        </MusicProvider>
       </body>
     </html>
   );
