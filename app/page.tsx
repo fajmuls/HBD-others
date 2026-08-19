@@ -10,6 +10,9 @@ export default function Home() {
 
   const handleFlowComplete = () => {
     setShowGallery(true);
+    // Explicitly play music if browser blocked it
+    const audio = document.getElementById('bg-music') as HTMLAudioElement;
+    if (audio) audio.play().catch(() => {});
   };
 
   const userImages = [
@@ -36,7 +39,7 @@ export default function Home() {
         <InteractionFlow onFlowComplete={handleFlowComplete} />
       ) : (
         <>
-          <audio src="/pretty.mp3" autoPlay loop className="hidden" />
+          <audio id="bg-music" src="/pretty.mp3" autoPlay loop className="hidden" />
           <DomeGallery
             images={userImages}
             fit={0.8}

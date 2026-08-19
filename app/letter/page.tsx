@@ -95,10 +95,10 @@ export default function LetterPage() {
                 initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
                 animate={{ opacity: 1, scale: 1, rotate: polaroid.rotation.includes('-') ? -5 : 5 }}
                 transition={{ delay: 0.4 + (idx * 0.2), type: 'spring' }}
-                className={`absolute ${polaroid.position} w-28 md:w-36 bg-white p-2 pb-6 md:p-3 md:pb-10 shadow-xl border border-black/5 z-20 pointer-events-none`}
+                className={`absolute ${polaroid.position} w-32 md:w-48 bg-white p-2 pb-8 md:p-3 md:pb-12 shadow-2xl border border-black/5 z-20 pointer-events-none`}
               >
-                <div className="w-full aspect-square bg-gray-50 overflow-hidden relative border border-black/5">
-                  <img src={polaroid.src} alt="Memory" className="absolute inset-0 w-full h-full object-cover grayscale-[0.2] hover:grayscale-0 transition-all" />
+                <div className="w-full aspect-square bg-white overflow-hidden relative border border-black/5">
+                  <img src={polaroid.src} alt="Memory" className="absolute inset-0 w-full h-full object-cover transition-all" />
                 </div>
               </motion.div>
             ))}
