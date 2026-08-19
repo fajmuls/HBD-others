@@ -2,24 +2,21 @@
 
 import { useState } from 'react';
 import { APP_VERSION, PATCH_NOTES } from '@/lib/version';
-import Link from 'next/link';
-import { ArrowLeft, History, Info } from 'lucide-react';
+import { History, Info } from 'lucide-react';
+import Navigation from '@/components/Navigation';
 
 export default function AdminDashboard() {
   const [showNotes, setShowNotes] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#060010] text-white p-8 font-sans">
+    <div className="min-h-screen bg-[#060010] text-white p-8 font-sans pb-32">
+      <Navigation />
       <div className="max-w-4xl mx-auto space-y-8">
         <header className="flex items-center justify-between border-b border-white/10 pb-6">
           <div>
             <h1 className="text-3xl font-bold font-playfair tracking-wide text-red-400">Admin Dashboard</h1>
             <p className="text-white/60 mt-2">Manage and view application status.</p>
           </div>
-          <Link href="/" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
-            <ArrowLeft size={20} />
-            Back to App
-          </Link>
         </header>
 
         <section className="grid grid-cols-1 md:grid-cols-3 gap-6">

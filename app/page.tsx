@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import DomeGallery from '@/components/DomeGallery';
 import InteractionFlow from '@/components/InteractionFlow';
-import Link from 'next/link';
-import { Settings } from 'lucide-react';
+import Navigation from '@/components/Navigation';
 
 export default function Home() {
   const [showGallery, setShowGallery] = useState(false);
@@ -44,15 +43,9 @@ export default function Home() {
             grayscale={false}
             autoRotationSpeed={0.1}
           />
+          <Navigation />
         </>
       )}
-      <Link 
-        href="/admin" 
-        className="fixed bottom-4 right-4 z-50 p-2 rounded-full bg-white/5 border border-white/10 text-white/40 hover:text-white/80 hover:bg-white/10 transition-all backdrop-blur-sm"
-        aria-label="Admin Dashboard"
-      >
-        <Settings size={18} />
-      </Link>
     </main>
   );
 }
