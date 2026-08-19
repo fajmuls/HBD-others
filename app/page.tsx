@@ -1,15 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DomeGallery from '@/components/DomeGallery';
 import InteractionFlow from '@/components/InteractionFlow';
 import Navigation from '@/components/Navigation';
 
+let flowCompletedGlobal = false;
+
 export default function Home() {
-  const [showGallery, setShowGallery] = useState(false);
+  const [showGallery, setShowGallery] = useState(flowCompletedGlobal);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleFlowComplete = () => {
     setShowGallery(true);
+    flowCompletedGlobal = true;
     // Explicitly play music if browser blocked it
     const audio = document.getElementById('bg-music') as HTMLAudioElement;
     if (audio) audio.play().catch(() => {});
@@ -34,6 +45,8 @@ export default function Home() {
     { src: '/16.jpeg', message: "Momen spesial yang tak terlupakan." },
     { src: '/17.jpeg', message: "Masa depan cerah menanti kita." },
   ];
+
+  if (!isLoaded) return <main className="w-screen h-screen bg-[#060010]" />;
 
   return (
     <main className="w-screen h-screen bg-[#060010]">

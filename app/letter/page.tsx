@@ -77,7 +77,7 @@ export default function LetterPage() {
   };
 
   return (
-    <main className="w-screen min-h-screen bg-[#060010] text-white flex items-center justify-center p-6 pb-32 overflow-hidden relative">
+    <main ref={constraintsRef} className="w-screen min-h-screen bg-[#060010] text-white flex items-center justify-center p-6 pb-32 overflow-hidden relative">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(239,68,68,0.1)_0%,transparent_60%)] pointer-events-none" />
       <Navigation />
       
@@ -89,12 +89,11 @@ export default function LetterPage() {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
-            ref={constraintsRef}
             initial={{ rotateY: 90, opacity: 0, transformOrigin: 'left' }}
             animate={{ rotateY: 0, opacity: 1 }}
             exit={{ rotateY: -90, opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="bg-[#fefaf3] text-[#333] p-6 md:p-12 rounded-r-2xl rounded-l-md shadow-2xl min-h-[400px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-hidden flex flex-col"
+            className="bg-[#fefaf3] text-[#333] p-6 md:p-12 rounded-r-2xl rounded-l-md shadow-2xl min-h-[400px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-visible flex flex-col"
           >
             {/* Texture kertas ringan */}
             <div className="absolute inset-0 opacity-15 pointer-events-none" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/paper.png')" }} />

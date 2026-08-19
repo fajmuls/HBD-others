@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useCallback, useState } from 'react';
 import { useGesture } from '@use-gesture/react';
 
 type ImageItem = string | { src: string; alt?: string; message?: string };
@@ -112,10 +112,12 @@ function buildItems(pool: ImageItem[], seg: number): ItemDef[] {
 
   const usedImages = Array.from({ length: totalSlots }, (_, i) => normalizedImages[i % normalizedImages.length]);
 
-  // Fisher-Yates shuffle for variety
-  for (let i = usedImages.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [usedImages[i], usedImages[j]] = [usedImages[j], usedImages[i]];
+  // Fisher-Yates shuffle for variety - only on client to avoid hydration mismatch
+  if (typeof window !== 'undefined') {
+    for (let i = usedImages.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [usedImages[i], usedImages[j]] = [usedImages[j], usedImages[i]];
+    }
   }
 
   return coords.map((c, i) => ({ 
@@ -181,6 +183,11 @@ export default function DomeGallery({
   const lastDragEndAt = useRef(0);
 
   const scrollLockedRef = useRef(false);
+  const [hasMounted, setHasMounted] = useState(false);
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
   const lockScroll = useCallback(() => {
     if (scrollLockedRef.current) return;
     scrollLockedRef.current = true;
@@ -661,8 +668,15 @@ export default function DomeGallery({
         overlay.removeEventListener('transitionend', onFirstEnd);
         const prevTransition = overlay.style.transition;
         overlay.style.transition = 'none';
-        const tempWidth = openedImageWidth || `${frameR.width}px`;
-        const tempHeight = openedImageHeight || `${frameR.height}px`;
+        const isMobile = window.innerWidth <= 768;
+        let tempWidth = openedImageWidth || `${frameR.width}px`;
+        let tempHeight = openedImageHeight || `${frameR.height}px`;
+
+        if (isMobile) {
+          tempWidth = '85vw';
+          tempHeight = '85vw';
+        }
+
         overlay.style.width = tempWidth;
         overlay.style.height = tempHeight;
         const newRect = overlay.getBoundingClientRect();
@@ -690,16 +704,38 @@ export default function DomeGallery({
     }
 
     // Add romantic labels
+    const pairs = [
+      ['My', 'Love'], ['My', 'Everything'], ['My', 'World'], ['My', 'Soulmate'], 
+      ['My', 'Future'], ['My', 'Happiness'], ['Sweet', 'Heart'], ['Forever', 'Yours'], 
+      ['Only', 'You'], ['Always', 'Yours'], ['My', 'Sunshine'], ['Truly', 'Madly'],
+      ['My', 'Precious'], ['My', 'Universe']
+    ];
+    const pair = pairs[Math.floor(Math.random() * pairs.length)];
+
     const labelLeft = document.createElement('div');
     labelLeft.className = 'romantic-label label-left font-playfair';
-    labelLeft.innerText = 'My';
+    labelLeft.innerText = pair[0];
 
     const labelRight = document.createElement('div');
     labelRight.className = 'romantic-label label-right font-playfair';
-    labelRight.innerText = 'Everything';
+    labelRight.innerText = pair[1];
 
     viewerRef.current?.appendChild(labelLeft);
     viewerRef.current?.appendChild(labelRight);
+
+    const checkAndShowLabels = () => {
+      if (rootRef.current?.getAttribute('data-enlarging') === 'true') {
+        const isMobile = window.innerWidth <= 768;
+        labelLeft.style.opacity = '1';
+        labelLeft.style.transform = isMobile ? 'translate(0, 0)' : 'translate(0, -50%)';
+        labelRight.style.opacity = '1';
+        labelRight.style.transform = isMobile ? 'translate(0, 0)' : 'translate(0, -50%)';
+      } else {
+        labelLeft.remove();
+        labelRight.remove();
+      }
+    };
+    setTimeout(checkAndShowLabels, enlargeTransitionMs);
 
     // Play open sound
     try {
@@ -849,6 +885,8 @@ export default function DomeGallery({
       }
     }
   `;
+
+  if (!hasMounted) return <div ref={rootRef} className="sphere-root w-full h-full bg-transparent" />;
 
   return (
     <>

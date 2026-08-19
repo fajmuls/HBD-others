@@ -6,13 +6,22 @@ import { Heart, X, Circle } from 'lucide-react';
 import { useMusic } from './MusicProvider';
 
 // --- Background Particles ---
+const generateHearts = () => [...Array(10)].map((_, i) => ({
+    id: i,
+    x: `${(i * 10) + Math.random() * 5}%`,
+    duration: 15 + Math.random() * 10,
+    delay: i * 2
+}));
+
 const BackgroundHearts = () => {
-    const [hearts] = useState(() => [...Array(10)].map((_, i) => ({
-        id: i,
-        x: `${(i * 10) + Math.random() * 5}%`,
-        duration: 15 + Math.random() * 10,
-        delay: i * 2
-    })));
+    const [hearts, setHearts] = useState<{ id: number; x: string; duration: number; delay: number }[]>([]);
+    
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setHearts(generateHearts());
+        }, 0);
+        return () => clearTimeout(timer);
+    }, []);
     
     if (hearts.length === 0) return null;
     return (
