@@ -447,132 +447,132 @@ export default function DomeGallery({
     { target: mainRef, eventOptions: { passive: false } }
   );
 
-  useEffect(() => {
-    const scrim = scrimRef.current;
-    if (!scrim) return;
+  const close = useCallback(() => {
+    if (performance.now() - openStartedAtRef.current < 250) return;
+    const el = focusedElRef.current;
+    if (!el) return;
+    const parent = el.parentElement as HTMLElement;
+    const overlay = viewerRef.current?.querySelector('.enlarge') as HTMLElement | null;
+    if (!overlay) return;
 
-    const close = () => {
-      if (performance.now() - openStartedAtRef.current < 250) return;
-      const el = focusedElRef.current;
-      if (!el) return;
-      const parent = el.parentElement as HTMLElement;
-      const overlay = viewerRef.current?.querySelector('.enlarge') as HTMLElement | null;
-      if (!overlay) return;
+    const refDiv = parent.querySelector('.item__image--reference') as HTMLElement | null;
 
-      const refDiv = parent.querySelector('.item__image--reference') as HTMLElement | null;
+    const originalPos = originalTilePositionRef.current;
+    if (!originalPos) {
+      overlay.remove();
+      if (refDiv) refDiv.remove();
+      parent.style.setProperty('--rot-y-delta', `0deg`);
+      parent.style.setProperty('--rot-x-delta', `0deg`);
+      el.style.visibility = '';
+      (el.style as any).zIndex = 0;
+      focusedElRef.current = null;
+      rootRef.current?.removeAttribute('data-enlarging');
+      openingRef.current = false;
+      viewerRef.current?.querySelectorAll('.romantic-label').forEach(el => el.remove());
+      return;
+    }
 
-      const originalPos = originalTilePositionRef.current;
-      if (!originalPos) {
-        overlay.remove();
-        if (refDiv) refDiv.remove();
-        parent.style.setProperty('--rot-y-delta', `0deg`);
-        parent.style.setProperty('--rot-x-delta', `0deg`);
+    const currentRect = overlay.getBoundingClientRect();
+    const rootRect = rootRef.current!.getBoundingClientRect();
+
+    const originalPosRelativeToRoot = {
+      left: originalPos.left - rootRect.left,
+      top: originalPos.top - rootRect.top,
+      width: originalPos.width,
+      height: originalPos.height
+    };
+
+    const overlayRelativeToRoot = {
+      left: currentRect.left - rootRect.left,
+      top: currentRect.top - rootRect.top,
+      width: currentRect.width,
+      height: currentRect.height
+    };
+
+    const animatingOverlay = document.createElement('div');
+    animatingOverlay.className = 'enlarge-closing';
+    animatingOverlay.style.cssText = `
+      position: absolute;
+      left: ${overlayRelativeToRoot.left}px;
+      top: ${overlayRelativeToRoot.top}px;
+      width: ${overlayRelativeToRoot.width}px;
+      height: ${overlayRelativeToRoot.height}px;
+      z-index: 9999;
+      border-radius: ${openedImageBorderRadius};
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      transition: all ${enlargeTransitionMs}ms ease-out;
+      pointer-events: none;
+      margin: 0;
+      transform: none;
+      filter: ${grayscale ? 'grayscale(1)' : 'none'};
+    `;
+
+    const originalImg = overlay.querySelector('img');
+    if (originalImg) {
+      const img = originalImg.cloneNode() as HTMLImageElement;
+      img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
+      animatingOverlay.appendChild(img);
+    }
+
+    overlay.remove();
+    rootRef.current!.appendChild(animatingOverlay);
+
+    void animatingOverlay.getBoundingClientRect();
+
+    requestAnimationFrame(() => {
+      animatingOverlay.style.left = originalPosRelativeToRoot.left + 'px';
+      animatingOverlay.style.top = originalPosRelativeToRoot.top + 'px';
+      animatingOverlay.style.width = originalPosRelativeToRoot.width + 'px';
+      animatingOverlay.style.height = originalPosRelativeToRoot.height + 'px';
+      animatingOverlay.style.opacity = '0';
+    });
+
+    const cleanup = () => {
+      animatingOverlay.remove();
+      originalTilePositionRef.current = null;
+
+      if (refDiv) refDiv.remove();
+      parent.style.transition = 'none';
+      el.style.transition = 'none';
+
+      parent.style.setProperty('--rot-y-delta', `0deg`);
+      parent.style.setProperty('--rot-x-delta', `0deg`);
+
+      requestAnimationFrame(() => {
         el.style.visibility = '';
+        el.style.opacity = '0';
         (el.style as any).zIndex = 0;
         focusedElRef.current = null;
         rootRef.current?.removeAttribute('data-enlarging');
-        openingRef.current = false;
-        viewerRef.current?.querySelectorAll('.romantic-label').forEach(el => el.remove());
-        return;
-      }
-
-      const currentRect = overlay.getBoundingClientRect();
-      const rootRect = rootRef.current!.getBoundingClientRect();
-
-      const originalPosRelativeToRoot = {
-        left: originalPos.left - rootRect.left,
-        top: originalPos.top - rootRect.top,
-        width: originalPos.width,
-        height: originalPos.height
-      };
-
-      const overlayRelativeToRoot = {
-        left: currentRect.left - rootRect.left,
-        top: currentRect.top - rootRect.top,
-        width: currentRect.width,
-        height: currentRect.height
-      };
-
-      const animatingOverlay = document.createElement('div');
-      animatingOverlay.className = 'enlarge-closing';
-      animatingOverlay.style.cssText = `
-        position: absolute;
-        left: ${overlayRelativeToRoot.left}px;
-        top: ${overlayRelativeToRoot.top}px;
-        width: ${overlayRelativeToRoot.width}px;
-        height: ${overlayRelativeToRoot.height}px;
-        z-index: 9999;
-        border-radius: ${openedImageBorderRadius};
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0,0,0,.35);
-        transition: all ${enlargeTransitionMs}ms ease-out;
-        pointer-events: none;
-        margin: 0;
-        transform: none;
-        filter: ${grayscale ? 'grayscale(1)' : 'none'};
-      `;
-
-      const originalImg = overlay.querySelector('img');
-      if (originalImg) {
-        const img = originalImg.cloneNode() as HTMLImageElement;
-        img.style.cssText = 'width: 100%; height: 100%; object-fit: cover;';
-        animatingOverlay.appendChild(img);
-      }
-
-      overlay.remove();
-      rootRef.current!.appendChild(animatingOverlay);
-
-      void animatingOverlay.getBoundingClientRect();
-
-      requestAnimationFrame(() => {
-        animatingOverlay.style.left = originalPosRelativeToRoot.left + 'px';
-        animatingOverlay.style.top = originalPosRelativeToRoot.top + 'px';
-        animatingOverlay.style.width = originalPosRelativeToRoot.width + 'px';
-        animatingOverlay.style.height = originalPosRelativeToRoot.height + 'px';
-        animatingOverlay.style.opacity = '0';
-      });
-
-      const cleanup = () => {
-        animatingOverlay.remove();
-        originalTilePositionRef.current = null;
-
-        if (refDiv) refDiv.remove();
-        parent.style.transition = 'none';
-        el.style.transition = 'none';
-
-        parent.style.setProperty('--rot-y-delta', `0deg`);
-        parent.style.setProperty('--rot-x-delta', `0deg`);
 
         requestAnimationFrame(() => {
-          el.style.visibility = '';
-          el.style.opacity = '0';
-          (el.style as any).zIndex = 0;
-          focusedElRef.current = null;
-          rootRef.current?.removeAttribute('data-enlarging');
+          parent.style.transition = '';
+          el.style.transition = 'opacity 300ms ease-out';
 
           requestAnimationFrame(() => {
-            parent.style.transition = '';
-            el.style.transition = 'opacity 300ms ease-out';
-
-            requestAnimationFrame(() => {
-              el.style.opacity = '1';
-              setTimeout(() => {
-                el.style.transition = '';
-                el.style.opacity = '';
-                openingRef.current = false;
-                if (!draggingRef.current && rootRef.current?.getAttribute('data-enlarging') !== 'true') {
-                  document.body.classList.remove('dg-scroll-lock');
-                }
-              }, 300);
-            });
+            el.style.opacity = '1';
+            setTimeout(() => {
+              el.style.transition = '';
+              el.style.opacity = '';
+              openingRef.current = false;
+              if (!draggingRef.current && rootRef.current?.getAttribute('data-enlarging') !== 'true') {
+                document.body.classList.remove('dg-scroll-lock');
+              }
+            }, 300);
           });
         });
-      };
-
-      animatingOverlay.addEventListener('transitionend', cleanup, {
-        once: true
       });
     };
+
+    animatingOverlay.addEventListener('transitionend', cleanup, {
+      once: true
+    });
+  }, [enlargeTransitionMs, openedImageBorderRadius, grayscale]);
+
+  useEffect(() => {
+    const scrim = scrimRef.current;
+    if (!scrim) return;
 
     scrim.addEventListener('click', close);
     const onKey = (e: KeyboardEvent) => {
@@ -584,7 +584,7 @@ export default function DomeGallery({
       scrim.removeEventListener('click', close);
       window.removeEventListener('keydown', onKey);
     };
-  }, [enlargeTransitionMs, openedImageBorderRadius, grayscale]);
+  }, [close]);
 
   const openItemFromElement = (el: HTMLElement) => {
     if (openingRef.current) return;
@@ -645,6 +645,7 @@ export default function DomeGallery({
     img.style.cssText = `width:100%; height:100%; object-fit:cover; filter:${grayscale ? 'grayscale(1)' : 'none'}; border-radius:${openedImageBorderRadius};`;
     overlay.appendChild(img);
 
+    overlay.addEventListener('click', close);
     viewerRef.current!.appendChild(overlay);
     const tx0 = tileR.left - frameR.left;
     const ty0 = tileR.top - frameR.top;
@@ -773,12 +774,13 @@ export default function DomeGallery({
       position: absolute;
       inset: 0;
       margin: auto;
-      perspective: calc(var(--radius) * 2);
+      perspective: calc(var(--radius) * 2.5);
       perspective-origin: 50% 50%;
+      transform: translateY(20px);
     }
     
     .sphere {
-      transform: translateZ(calc(var(--radius) * -1));
+      transform: translateZ(calc(var(--radius) * -1.2));
       will-change: transform;
       position: absolute;
     }
@@ -806,15 +808,23 @@ export default function DomeGallery({
     }
     
     @media (max-width: 768px) {
+      .sphere-root {
+        --viewer-pad: 24px;
+      }
       .viewer-frame {
         width: 85vw !important;
         height: 85vw !important;
-        max-height: 80vh !important;
+        max-height: 70vh !important;
+      }
+      .stage {
+        transform: translateY(0);
       }
     }
     
-    .enlarge {
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    .enlarge, .enlarge-closing {
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+      cursor: pointer;
+      box-sizing: border-box;
     }
     
     .romantic-label {

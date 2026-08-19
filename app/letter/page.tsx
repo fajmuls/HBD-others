@@ -89,17 +89,18 @@ export default function LetterPage() {
         <AnimatePresence mode="wait">
           <motion.div
             key={currentPage}
+            ref={constraintsRef}
             initial={{ rotateY: 90, opacity: 0, transformOrigin: 'left' }}
             animate={{ rotateY: 0, opacity: 1 }}
             exit={{ rotateY: -90, opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="bg-[#fefaf3] text-[#333] p-6 md:p-12 rounded-r-2xl rounded-l-md shadow-2xl min-h-[400px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-visible flex flex-col"
+            className="bg-[#fefaf3] text-[#333] p-6 md:p-12 rounded-r-2xl rounded-l-md shadow-2xl min-h-[400px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-hidden flex flex-col"
           >
             {/* Texture kertas ringan */}
-            <div className="absolute inset-0 opacity-15 pointer-events-none" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/paper.png')" }} />
+            <div className="absolute inset-0 opacity-15 pointer-events-none z-0" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/paper.png')" }} />
             
             {/* Lined Paper Effect */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.05]" style={{ background: 'repeating-linear-gradient(transparent, transparent 31px, #333 32px)' }} />
+            <div className="absolute inset-0 pointer-events-none opacity-[0.05] z-0" style={{ background: 'repeating-linear-gradient(transparent, transparent 31px, #333 32px)' }} />
 
             <h2 className="text-xl md:text-3xl font-playfair font-bold text-[#4a2c16] mb-4 relative z-10 border-b border-[#4a2c16]/10 pb-2 italic leading-tight">{pages[currentPage].title}</h2>
             <p className="text-[13px] sm:text-base md:text-lg font-serif leading-relaxed sm:leading-loose text-gray-700 whitespace-pre-wrap relative z-10 flex-grow">
