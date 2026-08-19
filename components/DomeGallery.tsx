@@ -849,24 +849,28 @@ export default function DomeGallery({
       pointer-events: all !important;
     }
     
-    @media (max-aspect-ratio: 1/1) {
+    @media (max-width: 768px) {
       .viewer-frame {
+        width: 90vw !important;
         height: auto !important;
+        max-height: 70vh !important;
+        aspect-ratio: auto !important;
+      }
+      .enlarge {
         width: 100% !important;
+        height: 100% !important;
+        left: 0 !important;
+        top: 0 !important;
+        position: relative !important;
+        transform: none !important;
       }
     }
     
-    // body.dg-scroll-lock {
-    //   position: fixed !important;
-    //   top: 0;
-    //   left: 0;
-    //   width: 100% !important;
-    //   height: 100% !important;
-    //   overflow: hidden !important;
-    //   touch-action: none !important;
-    //   overscroll-behavior: contain !important;
-    // }
-    .item__image {
+    .enlarge {
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    
+    .romantic-label {
       position: absolute;
       inset: 10px;
       border-radius: var(--tile-radius, 12px);

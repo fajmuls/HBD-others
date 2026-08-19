@@ -3,6 +3,7 @@
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
+import { useMusic } from '@/components/MusicProvider';
 
 const playPageFlip = () => {
     try {
@@ -16,56 +17,62 @@ const playPageFlip = () => {
 
 const pages = [
   {
-    title: "Happy Birthday, Arya Rizki Munandar!",
+    title: "Awal Cerita Kita",
     content: "jujur ya, kalau ada mesin waktu yang bisa lempar aku balik ke masa-masa SMA dulu, aku pasti bakal ketawa paling keras kalau ada yang bilang kita bakal sampai di titik ini. dulu ngelihat kamu aja bawaannya udah pengen ngomel (sebel maksimallll T____T). kamu itu berisik, jahil, dan bener-bener cowoo yang masuk daftar “orang yang nggak akan pernah aku suka” hahahah asli :p.",
     polaroids: [
       { src: "/1.jpeg", position: "bottom-4 right-[-10px] md:right-[-20px]", rotation: "rotate-[8deg]" }
     ]
   },
   {
-    title: "Semesta Bercanda...",
-    content: "tapi entah gimana caranya semesta bercanda, cowo yang selama ini paling bikin sebel sekarang malah jadi orang yang favorite buat aku, yang punya tempat paling hangat dan spesial di hati akuu :3♥️\n\nperjuangan kamu yang pantang menyerah buat luluhin hati akuu yang super duperr keras bener-bener bikin aku tersadar betapa beruntungnya aku punya kamuuuuu huhu. makaasi banyak ya, Arey sayang. makaasii udah sabar banget hadapin semua gengsiku, udah tulus dari awal, dan ngebuktiin kalau niat baik kamu itu nyata sampai akhirnya bikin aku ikutan jatuh cinta sejauh ini…. T___T",
+    title: "Semesta yang Bercanda",
+    content: "tapi entah gimana caranya semesta bercanda, cowo yang selama ini paling bikin sebel sekarang malah jadi orang yang favorite buat aku, yang punya tempat paling hangat dan spesial di hati akuu :3♥️",
     polaroids: [
       { src: "/2.jpeg", position: "bottom-4 left-[-10px] md:left-[-20px]", rotation: "-rotate-[6deg]" }
     ]
   },
   {
-    title: "Doa & Harapanku",
-    content: "semoga kamu selalu sehat, bahagia, dan dilindungi di mana pun kamu berada. semoga jalan kuliah kamu makin lancar, jalan menuju karir impian kamu dimudahkan banget, dan semua mimpi besar serta wishlist yang kamu susun diam-diam bisa terwujud satu per satu. semoga segala niat baik dan usaha keras kamu selalu dibalas dengan kebaikan yang melimpah. terus satu lagi, kurangi atau jangan ngerokok lagi yaa, semoga kamu bisa terus berubah jadi lebih baik setiap harinya. dan pastinya, semoga di setiap langkah menuju masa depan nanti, kita bisa terus saling genggam tangan, saling dukung, tumbuh bareng, dan laluin semuanya bareng-bareng terus tanpa ada yang dilepas.\n\nselamat ulang tahun ya, arey sayang <333",
+    title: "Ketulusan Hatimu",
+    content: "perjuangan kamu yang pantang menyerah buat luluhin hati akuu yang super duperr keras, penuh benteng takeshii, dan susah banget deh buat jatuh cinta ini bener-bener bikin aku tersadar betapa beruntungnya aku punya kamuuuuu huhu. makaasi banyak ya, Arey sayang. makaasii udah sabar banget hadapin semua gengsiku, udah tulus dari awal, dan ngebuktiin kalau niat baik kamu itu nyata sampai akhirnya bikin aku ikutan jatuh cinta sejauh ini…. T___T",
     polaroids: [
       { src: "/3.jpeg", position: "bottom-8 right-[-15px] md:right-[-30px]", rotation: "rotate-[12deg]" }
     ]
   },
   {
-    title: "Teman Hidup",
-    content: "🎵 Tulus – Teman Hidup\njujurr tiap dengerin lagu ini, aku pasti langsung kepikiran kamu, Arey. semua liriknya aku ngerasa \"kita banget\"\n\n\"Bila di depan nanti banyak cobaan kisah cinta kita\nJangan cepat menyerah\nKau punya aku, ku punya kamu...\"\n\nini sih harapan aku banget buat kita. nanti di depan pasti bakal ada aja ujian atau capeknya, tapi inget yaa... kita jangan gampang nyerah. kamuu tetep punya aku, dan aku punya kamu buat saling jagain bareng-bareng terus yaaaaa <33 !!",
+    title: "Doa di Hari Spesialmu",
+    content: "di umur kamu yang baru ini, doaku buat kamu panjang dan kencenggg banget. semoga kamu selalu sehat, bahagia, dan dilindungi di mana pun kamu berada. semoga jalan kuliah kamu makin lancar, jalan menuju karir impian kamu dimudahkan banget, dan semua mimpi besar serta wishlist yang kamu susun diam-diam bisa terwujud satu per satu. semoga segala niat baik dan usaha keras kamu selalu dibalas dengan kebaikan yang melimpah. terus satu lagi, kurangi atau jangan ngerokok lagi yaa, semoga kamu bisa terus berubah jadi lebih baik setiap harinya. dan pastinya, semoga di setiap langkah menuju masa depan nanti, kita bisa terus saling genggam tangan, saling dukung, tumbuh bareng, dan laluin semuanya bareng-bareng terus tanpa ada yang dilepas.\n\nselamat ulang tahun ya, arey sayang <333",
     polaroids: [
-      { src: "/4.jpeg", position: "bottom-12 left-[-15px] md:left-[-30px]", rotation: "-rotate-[10deg]" },
+      { src: "/4.jpeg", position: "bottom-12 left-[-15px] md:left-[-30px]", rotation: "-rotate-[10deg]" }
+    ]
+  },
+  {
+    title: "The Songs for You",
+    content: "🎵 Tulus – Teman Hidup\njujurr tiap dengerin lagu ini, aku pasti langsung kepikiran kamu, Arey. semua liriknya aku ngerasa \"kita banget\" dan pas sama apa yang aku harapin buat perjalanan kita ke depan\napalagi pas lirik yang ini:\n\n\"Dia yang s'lalu ada untukku\nDi dekatnya aku lebih tenang\nBersamanya jauh lebih terang\"\n\nbeneran se-relate itu :D…dari yang dulu bikin aku sebel maksimal 🥸🥸, sekarang kamu malah jadi orang yang paling bikin aku tenang dan hari-hariku kerasa jauh lebih seru yEayYyy :3♥️",
+    polaroids: [
       { src: "/5.jpeg", position: "bottom-4 right-[-10px] md:right-[-20px]", rotation: "rotate-[5deg]" }
+    ]
+  },
+  {
+    title: "Harapan Kita Bersama",
+    content: "terussss bagian ini nih yang paling ngena di hati (asekkk):\n\n\"Bila di depan nanti banyak cobaan kisah cinta kita\nJangan cepat menyerah\nKau punya aku, ku punya kamu...\"\n\nini sih harapan aku banget buat kita. nanti di depan pasti bakal ada aja ujian atau capeknya, tapi inget yaa... kita jangan gampang nyerah. kamuu tetep punya aku, dan aku punya kamu buat saling jagain bareng-bareng terus yaaaaa <33 !!",
+    polaroids: [
+      { src: "/1.jpeg", position: "bottom-10 left-[-10px]", rotation: "-rotate-[8deg]" }
     ]
   }
 ];
 
 export default function LetterPage() {
   const [currentPage, setCurrentPage] = useState(0);
+  const { playSFX } = useMusic();
   const constraintsRef = useRef(null);
 
   const next = () => {
-    try {
-      const click = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-      click.volume = 0.5;
-      click.play().catch(() => {});
-    } catch { }
-    playPageFlip();
+    playSFX('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', 0.5);
+    playSFX('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3', 0.5);
     setCurrentPage(p => Math.min(pages.length - 1, p + 1));
   };
   const prev = () => {
-    try {
-      const click = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-      click.volume = 0.5;
-      click.play().catch(() => {});
-    } catch { }
-    playPageFlip();
+    playSFX('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', 0.5);
+    playSFX('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3', 0.5);
     setCurrentPage(p => Math.max(0, p - 1));
   };
 

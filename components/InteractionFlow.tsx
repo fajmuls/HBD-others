@@ -5,29 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X, Circle } from 'lucide-react';
 import { useMusic } from './MusicProvider';
 
-const playAudio = (path: string) => {
-    try {
-        const fallbacks: Record<string, string> = {
-            'click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
-            'tictactoe-click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
-            'tictactoe-win.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3',
-            'love-mode.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3',
-            'typing.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
-        };
-        const audio = new Audio(`/sfx/${path}`);
-        audio.volume = 0.5;
-        audio.play().catch(() => {
-            if (fallbacks[path]) {
-                const fb = new Audio(fallbacks[path]);
-                fb.volume = 0.3;
-                fb.play().catch(() => {});
-            }
-        });
-    } catch {
-        // Safe to ignore
-    }
-};
-
 // --- Background Particles ---
 const BackgroundHearts = () => {
     const [hearts] = useState(() => [...Array(10)].map((_, i) => ({
@@ -58,7 +35,15 @@ const BackgroundHearts = () => {
 // --- Step 1: Love Mode ---
 const LoveModeStep = ({ onComplete }: { onComplete: () => void }) => {
     const [isOn, setIsOn] = useState(false);
-    const { setIsPlaying } = useMusic();
+    const { setIsPlaying, playSFX } = useMusic();
+
+    const playAudio = (path: string) => {
+        const fallbacks: Record<string, string> = {
+            'click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+            'love-mode.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'
+        };
+        playSFX(fallbacks[path] || `/sfx/${path}`, 0.5);
+    };
 
     useEffect(() => {
         if (isOn) {
@@ -102,6 +87,15 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
     const [board, setBoard] = useState(Array(9).fill(null));
     const [isUserTurn, setIsUserTurn] = useState(true);
     const [winner, setWinner] = useState<string | null>(null);
+    const { playSFX } = useMusic();
+
+    const playAudio = (path: string) => {
+        const fallbacks: Record<string, string> = {
+            'tictactoe-click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+            'tictactoe-win.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'
+        };
+        playSFX(fallbacks[path] || `/sfx/${path}`, 0.5);
+    };
 
     const message = winner === 'X' ? "Kamu Memenangkan" : winner === 'draw' ? "Seri! Coba lagi yaa ❤️" : winner === 'O' ? "Hampir! Sekali lagi..." : "Let's play a little game...";
 
@@ -175,6 +169,15 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
 // --- Step 3: Love Meter ---
 const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
     const [progress, setProgress] = useState(0);
+    const { playSFX } = useMusic();
+
+    const playAudio = (path: string) => {
+        const fallbacks: Record<string, string> = {
+            'tictactoe-click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+            'tictactoe-win.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'
+        };
+        playSFX(fallbacks[path] || `/sfx/${path}`, 0.5);
+    };
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -228,6 +231,14 @@ const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
     const text = "Happy Birthday Kak Arey Kuu!!!!";
     const [displayedText, setDisplayedText] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
+    const { playSFX } = useMusic();
+
+    const playAudio = (path: string) => {
+        const fallbacks: Record<string, string> = {
+            'typing.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3'
+        };
+        playSFX(fallbacks[path] || `/sfx/${path}`, 0.3);
+    };
 
     useEffect(() => {
         let timer: NodeJS.Timeout;
@@ -264,7 +275,7 @@ const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
 
 export default function InteractionFlow({ onFlowComplete }: { onFlowComplete: () => void }) {
     const [step, setStep] = useState(1);
-    const { setIsPlaying } = useMusic();
+    const { setIsPlaying, playSFX } = useMusic();
 
     const handleFlowComplete = () => {
         setIsPlaying(true);

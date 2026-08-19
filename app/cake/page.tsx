@@ -4,11 +4,13 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Navigation from '@/components/Navigation';
+import { useMusic } from '@/components/MusicProvider';
 
 export default function CakePage() {
   const [blown, setBlown] = useState(false);
   const [micEnabled, setMicEnabled] = useState(false);
   const [blowLevel, setBlowLevel] = useState(0);
+  const { playSFX } = useMusic();
 
   useEffect(() => {
     let audioContext: AudioContext;
@@ -63,17 +65,9 @@ export default function CakePage() {
     if (blown) return;
     setBlown(true);
     
-    try {
-      // Independent Audio objects to prevent ducking or interference
-      const blowSfx = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
-      blowSfx.volume = 1.0; 
-      blowSfx.play().catch(() => {});
-
-      // Short Happy Birthday celebration
-      const hbdSfx = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_731454c0e6.mp3?filename=happy-birthday-155461.mp3');
-      hbdSfx.volume = 0.8;
-      hbdSfx.play().catch(() => {});
-    } catch { }
+    // Use global playSFX for better mixing
+    playSFX('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3', 1.0);
+    playSFX('https://cdn.pixabay.com/audio/2022/03/15/audio_731454c0e6.mp3?filename=happy-birthday-155461.mp3', 0.8);
 
     // Confetti effect
     const duration = 3 * 1000;
@@ -125,11 +119,7 @@ export default function CakePage() {
         {/* The Cake - Upgraded Visuals */}
         <div className="relative cursor-pointer scale-[0.7] sm:scale-[0.9] md:scale-110 group perspective-[1000px]" onClick={() => {
           if (!blown) {
-            try {
-              const click = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
-              click.volume = 0.5;
-              click.play().catch(() => {});
-            } catch(e) {}
+            playSFX('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3', 0.5);
             handleBlowOut();
           }
         }}>
