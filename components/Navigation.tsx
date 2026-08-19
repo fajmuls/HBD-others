@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookHeart, Image as ImageIcon, Settings } from 'lucide-react';
+import { Home, BookHeart, Image as ImageIcon } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Navigation() {
@@ -12,7 +12,6 @@ export default function Navigation() {
     { path: '/', icon: Home, label: 'Home' },
     { path: '/letter', icon: BookHeart, label: 'Story' },
     { path: '/memories', icon: ImageIcon, label: 'Memories' },
-    { path: '/admin', icon: Settings, label: 'Admin' },
   ];
 
   return (

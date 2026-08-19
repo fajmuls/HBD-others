@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DomeGallery from '@/components/DomeGallery';
 import InteractionFlow from '@/components/InteractionFlow';
 import Navigation from '@/components/Navigation';
@@ -8,28 +8,39 @@ import Navigation from '@/components/Navigation';
 export default function Home() {
   const [showGallery, setShowGallery] = useState(false);
 
+  useEffect(() => {
+    if (localStorage.getItem('valentineFlowCompleted') === 'true') {
+      setShowGallery(true);
+    }
+  }, []);
+
+  const handleFlowComplete = () => {
+    localStorage.setItem('valentineFlowCompleted', 'true');
+    setShowGallery(true);
+  };
+
   const userImages = [
-    '/1.jpeg',
-    '/2.jpeg',
-    '/3.jpeg',
-    '/4.jpeg',
-    '/5.jpeg',
-    '/6.jpeg',
-    '/7.jpeg',
-    '/8.jpeg',
-    '/9.jpeg',
-    '/10.jpeg',
-    '/11.jpeg',
-    '/12.jpeg',
-    '/13.jpeg',
-    '/14.jpeg',
-    '/15.jpeg',
+    { src: '/1.jpeg', message: "Pertemuan pertama kita." },
+    { src: '/2.jpeg', message: "Senyummu selalu membuat hariku lebih cerah." },
+    { src: '/3.jpeg', message: "Momen lucu yang tak akan pernah kulupakan." },
+    { src: '/4.jpeg', message: "Perjalanan kita masih panjang." },
+    { src: '/5.jpeg', message: "Kamu adalah alasanku." },
+    { src: '/6.jpeg', message: "Bersamamu semuanya terasa lebih mudah." },
+    { src: '/7.jpeg', message: "Selalu jadi favoritku." },
+    { src: '/8.jpeg', message: "Tatapan itu..." },
+    { src: '/9.jpeg', message: "Setiap detiknya berharga." },
+    { src: '/10.jpeg', message: "Kenangan manis di hari itu." },
+    { src: '/11.jpeg', message: "Tawa yang selalu kurindukan." },
+    { src: '/12.jpeg', message: "Bersamamu." },
+    { src: '/13.jpeg', message: "Waktu seakan berhenti." },
+    { src: '/14.jpeg', message: "Hanya kita berdua." },
+    { src: '/15.jpeg', message: "I love you. Always." },
   ];
 
   return (
     <main className="w-screen h-screen bg-[#060010]">
       {!showGallery ? (
-        <InteractionFlow onFlowComplete={() => setShowGallery(true)} />
+        <InteractionFlow onFlowComplete={handleFlowComplete} />
       ) : (
         <>
           <audio src="/pretty.mp3" autoPlay loop className="hidden" />

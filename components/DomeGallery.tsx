@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useCallback } from 'react';
 import { useGesture } from '@use-gesture/react';
 
-type ImageItem = string | { src: string; alt?: string };
+type ImageItem = string | { src: string; alt?: string; message?: string };
 
 type DomeGalleryProps = {
   images?: ImageItem[];
@@ -26,7 +26,7 @@ type DomeGalleryProps = {
 
 type ItemDef = {
   src: string;
-  alt: string;
+  alt: string; message: string;
   x: number;
   y: number;
   sizeX: number;
@@ -95,7 +95,7 @@ function buildItems(pool: ImageItem[], seg: number): ItemDef[] {
 
   const totalSlots = coords.length;
   if (pool.length === 0) {
-    return coords.map(c => ({ ...c, src: '', alt: '' }));
+    return coords.map(c => ({ ...c, src: '', alt: '', message: '' }));
   }
   if (pool.length > totalSlots) {
     console.warn(
@@ -107,7 +107,7 @@ function buildItems(pool: ImageItem[], seg: number): ItemDef[] {
     if (typeof image === 'string') {
       return { src: image, alt: '' };
     }
-    return { src: image.src || '', alt: image.alt || '' };
+    return { src: image.src || '', alt: image.alt || '', message: (image as any).message || '' };
   });
 
   const usedImages = Array.from({ length: totalSlots }, (_, i) => normalizedImages[i % normalizedImages.length]);
@@ -125,7 +125,7 @@ function buildItems(pool: ImageItem[], seg: number): ItemDef[] {
     }
   }
 
-  return coords.map((c, i) => ({
+  return coords.map((c, i) => ({ message: usedImages[i].message,
     ...c,
     src: usedImages[i].src,
     alt: usedImages[i].alt
@@ -139,7 +139,7 @@ function computeItemBaseRotation(offsetX: number, offsetY: number, sizeX: number
   return { rotateX, rotateY };
 }
 
-export default function DomeGallery({
+export default function DomeGallery({ 
   images = DEFAULT_IMAGES,
   fit = 0.5,
   fitBasis = 'auto',
@@ -647,11 +647,56 @@ export default function DomeGallery({
     overlay.style.cssText = `position:absolute; left:${frameR.left - mainR.left}px; top:${frameR.top - mainR.top}px; width:${frameR.width}px; height:${frameR.height}px; opacity:0; z-index:30; will-change:transform,opacity; transform-origin:top left; transition:transform ${enlargeTransitionMs}ms ease, opacity ${enlargeTransitionMs}ms ease; border-radius:${openedImageBorderRadius}; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.35);`;
     const rawSrc = parent.dataset.src || (el.querySelector('img') as HTMLImageElement)?.src || '';
     const rawAlt = parent.dataset.alt || (el.querySelector('img') as HTMLImageElement)?.alt || '';
+    const rawMessage = parent.dataset.message || '';
+
+    overlay.style.perspective = '1000px';
+
+    const flipper = document.createElement('div');
+    flipper.style.cssText = `position: relative; width: 100%; height: 100%; transform-style: preserve-3d; transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);`;
+
+    const imgContainer = document.createElement('div');
+    imgContainer.style.cssText = `position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden;`;
+
     const img = document.createElement('img');
     img.src = rawSrc;
     img.alt = rawAlt;
-    img.style.cssText = `width:100%; height:100%; object-fit:cover; filter:${grayscale ? 'grayscale(1)' : 'none'};`;
-    overlay.appendChild(img);
+    img.style.cssText = `width:100%; height:100%; object-fit:cover; filter:${grayscale ? 'grayscale(1)' : 'none'}; border-radius:${openedImageBorderRadius};`;
+    imgContainer.appendChild(img);
+
+    const backContainer = document.createElement('div');
+    backContainer.style.cssText = `position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; transform: rotateY(180deg); background: #fdfbf7; border-radius:${openedImageBorderRadius}; padding: 30px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; border: 4px solid #fff; box-shadow: inset 0 0 20px rgba(0,0,0,0.05);`;
+    
+    // Add texture
+    const texture = document.createElement('div');
+    texture.style.cssText = `position: absolute; inset: 0; opacity: 0.3; pointer-events: none; background-image: url('https://www.transparenttextures.com/patterns/paper.png');`;
+    backContainer.appendChild(texture);
+
+    const msgElement = document.createElement('p');
+    msgElement.style.cssText = `color: #4a3b32; font-family: 'Playfair Display', serif; font-size: 1.25rem; line-height: 1.6; font-style: italic; z-index: 10; font-weight: 500;`;
+    msgElement.innerText = rawMessage || "Sebuah kenangan indah...";
+    backContainer.appendChild(msgElement);
+
+    const tapHint = document.createElement('div');
+    tapHint.style.cssText = `position: absolute; bottom: 20px; font-size: 0.8rem; color: #a0938a; font-family: sans-serif; letter-spacing: 1px; uppercase; z-index: 10; font-weight: 600;`;
+    tapHint.innerText = 'TAP TO FLIP BACK';
+    backContainer.appendChild(tapHint);
+
+    flipper.appendChild(imgContainer);
+    flipper.appendChild(backContainer);
+    overlay.appendChild(flipper);
+
+    let isFlipped = false;
+    overlay.addEventListener('click', (e) => {
+        e.stopPropagation(); // prevent closing
+        isFlipped = !isFlipped;
+        flipper.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
+        
+        // Hide romantic labels when flipped
+        viewerRef.current?.querySelectorAll('.romantic-label').forEach(label => {
+            (label as HTMLElement).style.opacity = isFlipped ? '0' : '1';
+        });
+    });
+
     viewerRef.current!.appendChild(overlay);
     const tx0 = tileR.left - frameR.left;
     const ty0 = tileR.top - frameR.top;
@@ -902,6 +947,7 @@ export default function DomeGallery({
                   className="sphere-item absolute m-auto"
                   data-src={it.src}
                   data-alt={it.alt}
+                  data-message={it.message}
                   data-offset-x={it.x}
                   data-offset-y={it.y}
                   data-size-x={it.sizeX}
