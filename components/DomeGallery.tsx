@@ -451,6 +451,10 @@ export default function DomeGallery({
     if (performance.now() - openStartedAtRef.current < 250) return;
     const el = focusedElRef.current;
     if (!el) return;
+
+    // Immediately remove labels and close button when closing starts
+    viewerRef.current?.querySelectorAll('.romantic-label, .close-btn').forEach(el => el.remove());
+
     const parent = el.parentElement as HTMLElement;
     const overlay = viewerRef.current?.querySelector('.enlarge') as HTMLElement | null;
     if (!overlay) return;
@@ -468,7 +472,6 @@ export default function DomeGallery({
       focusedElRef.current = null;
       rootRef.current?.removeAttribute('data-enlarging');
       openingRef.current = false;
-      viewerRef.current?.querySelectorAll('.romantic-label, .close-btn').forEach(el => el.remove());
       return;
     }
 
@@ -531,7 +534,6 @@ export default function DomeGallery({
     const cleanup = () => {
       animatingOverlay.remove();
       originalTilePositionRef.current = null;
-      viewerRef.current?.querySelectorAll('.close-btn, .romantic-label').forEach(el => el.remove());
 
       if (refDiv) refDiv.remove();
       parent.style.transition = 'none';
