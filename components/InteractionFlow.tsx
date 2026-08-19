@@ -158,39 +158,73 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
     );
 };
 
-// --- Step 3: Love Meter ---
+// --- Step 3: Love Meter (Heart Fill) ---
 const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
     const [progress, setProgress] = useState(0);
 
     useEffect(() => {
         const interval = setInterval(() => {
             setProgress(prev => {
-                if (prev >= 100) { clearInterval(interval); setTimeout(() => onComplete(), 1500); return 100; }
+                if (prev >= 100) { 
+                    clearInterval(interval); 
+                    playAudio('tictactoe-win.mp3'); // Completion sound
+                    setTimeout(() => onComplete(), 2000); 
+                    return 100; 
+                }
+                // Play a subtle heartbeat sound at intervals
+                if (prev % 20 === 0) playAudio('tictactoe-click.mp3');
                 return prev + 1;
             });
-        }, 40);
+        }, 50);
         return () => clearInterval(interval);
     }, [onComplete]);
 
-    const radius = 90;
-    const circumference = Math.PI * radius;
-    const dashOffset = circumference - (progress / 100) * circumference;
-
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center space-y-12 w-full max-w-lg px-6 relative z-10">
-            <div className="relative w-full aspect-[2/1] flex flex-col items-center justify-end overflow-hidden">
-                <svg viewBox="0 0 200 100" className="w-full h-full absolute top-0 overflow-visible">
-                    <path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="12" strokeLinecap="round" />
-                    <motion.path d="M 10,100 A 90,90 0 0 1 190,100" fill="none" stroke="url(#loveGradient)" strokeWidth="12" strokeLinecap="round" strokeDasharray={circumference} animate={{ strokeDashoffset: dashOffset }} transition={{ duration: 0.1, ease: "linear" }} style={{ filter: 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.6))' }} />
-                    <defs><linearGradient id="loveGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#ef4444" /><stop offset="100%" stopColor="#ec4899" /></linearGradient></defs>
-                </svg>
-                <div className="z-10 flex flex-col items-center pb-4">
-                    <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}><Heart className="w-16 h-16 text-red-500 fill-red-500 mb-2" /></motion.div>
-                    <div className="text-6xl font-black text-white font-mono tracking-tighter">{progress}<span className="text-red-400 text-3xl">%</span></div>
-                    <span className="text-2xl text-white/60 font-playfair italic mt-2 tracking-widest">Love Intensity</span>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center space-y-12 w-full max-w-sm px-6 relative z-10">
+            <div className="relative w-64 h-64 flex items-center justify-center">
+                {/* Background Heart (Empty) */}
+                <Heart className="absolute w-full h-full text-white/5" fill="currentColor" strokeWidth={1} />
+                
+                {/* Filling Heart */}
+                <div className="absolute inset-0 overflow-hidden" style={{ clipPath: `inset(${100 - progress}% 0 0 0)` }}>
+                    <motion.div 
+                        animate={{ scale: [1, 1.05, 1] }} 
+                        transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
+                    >
+                        <Heart className="w-64 h-64 text-red-500 fill-red-500 filter drop-shadow-[0_0_20px_rgba(239,68,68,0.4)]" />
+                    </motion.div>
+                </div>
+
+                {/* Percentage Text */}
+                <div className="z-20 flex flex-col items-center">
+                    <motion.div 
+                        key={progress}
+                        initial={{ scale: 0.8, opacity: 0 }} 
+                        animate={{ scale: 1, opacity: 1 }}
+                        className="text-5xl font-black text-white font-mono tracking-tighter"
+                    >
+                        {progress}<span className="text-red-400 text-2xl">%</span>
+                    </motion.div>
                 </div>
             </div>
-            <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/5"><motion.div className="h-full bg-gradient-to-r from-red-500 to-pink-500" animate={{ width: `${progress}%` }} /></div>
+
+            <div className="w-full space-y-3">
+                <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/30">
+                    <span>Intensity</span>
+                    <span>{progress === 100 ? "MAXIMUM" : "CALCULATING..."}</span>
+                </div>
+                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                    <motion.div 
+                        className="h-full bg-gradient-to-r from-red-600 via-pink-500 to-red-600" 
+                        animate={{ width: `${progress}%` }} 
+                        transition={{ duration: 0.1 }}
+                    />
+                </div>
+            </div>
+            
+            <p className="text-sm text-white/40 font-playfair italic text-center animate-pulse">
+                "My heart beats faster when I'm with you..."
+            </p>
         </motion.div>
     );
 };
