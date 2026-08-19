@@ -415,7 +415,7 @@ export default function DomeGallery({
             }
           }
 
-          let [vMagX, vMagY] = velArr;
+          const [vMagX, vMagY] = velArr;
           const [dirX, dirY] = dirArr;
           let vx = vMagX * dirX;
           let vy = vMagY * dirY;
@@ -531,7 +531,7 @@ export default function DomeGallery({
     const cleanup = () => {
       animatingOverlay.remove();
       originalTilePositionRef.current = null;
-      viewerRef.current?.querySelectorAll('.close-btn').forEach(el => el.remove());
+      viewerRef.current?.querySelectorAll('.close-btn, .romantic-label').forEach(el => el.remove());
 
       if (refDiv) refDiv.remove();
       parent.style.transition = 'none';
@@ -634,12 +634,32 @@ export default function DomeGallery({
     };
     el.style.visibility = 'hidden';
     (el.style as any).zIndex = 0;
-    const overlay = document.createElement('div');
-    overlay.className = 'enlarge';
-    overlay.style.cssText = `position:absolute; left:${frameR.left - mainR.left}px; top:${frameR.top - mainR.top}px; width:${frameR.width}px; height:${frameR.height}px; opacity:0; z-index:30; will-change:transform,opacity; transform-origin:top left; transition:transform ${enlargeTransitionMs}ms ease, opacity ${enlargeTransitionMs}ms ease; border-radius:${openedImageBorderRadius}; overflow:hidden; box-shadow:0 10px 30px rgba(0,0,0,.35);`;
     const rawSrc = parent.dataset.src || (el.querySelector('img') as HTMLImageElement)?.src || '';
     const rawAlt = parent.dataset.alt || (el.querySelector('img') as HTMLImageElement)?.alt || '';
 
+    const isMobile = window.innerWidth <= 768;
+    let finalWidth = openedImageWidth || `${frameR.width}px`;
+    let finalHeight = openedImageHeight || `${frameR.height}px`;
+
+    if (isMobile) {
+      finalWidth = '85vw';
+      finalHeight = '85vw';
+    }
+
+    const overlay = document.createElement('div');
+    overlay.className = 'enlarge';
+    // Position it centered initially but we'll use transform to move it from the tile
+    const tempDiv = document.createElement('div');
+    tempDiv.style.cssText = `position: absolute; width: ${finalWidth}; height: ${finalHeight}; visibility: hidden;`;
+    document.body.appendChild(tempDiv);
+    const targetRect = tempDiv.getBoundingClientRect();
+    document.body.removeChild(tempDiv);
+
+    const centeredLeft = frameR.left - mainR.left + (frameR.width - targetRect.width) / 2;
+    const centeredTop = frameR.top - mainR.top + (frameR.height - targetRect.height) / 2;
+
+    overlay.style.cssText = `position:absolute; left:${centeredLeft}px; top:${centeredTop}px; width:${finalWidth}; height:${finalHeight}; opacity:1; z-index:30; will-change:transform,opacity; transform-origin:center center; transition:transform ${enlargeTransitionMs}ms cubic-bezier(0.4, 0, 0.2, 1), opacity ${enlargeTransitionMs}ms ease; border-radius:${openedImageBorderRadius}; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,0.5);`;
+    
     const img = document.createElement('img');
     img.src = rawSrc;
     img.alt = rawAlt;
@@ -651,69 +671,27 @@ export default function DomeGallery({
     const closeBtn = document.createElement('div');
     closeBtn.className = 'close-btn';
     closeBtn.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
-    closeBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
+    closeBtn.addEventListener('click', () => {
       close();
     });
     viewerRef.current!.appendChild(closeBtn);
 
     viewerRef.current!.appendChild(overlay);
-    const tx0 = tileR.left - frameR.left;
-    const ty0 = tileR.top - frameR.top;
-    const sx0 = tileR.width / frameR.width;
-    const sy0 = tileR.height / frameR.height;
 
-    const validSx0 = isFinite(sx0) && sx0 > 0 ? sx0 : 1;
-    const validSy0 = isFinite(sy0) && sy0 > 0 ? sy0 : 1;
+    // Initial transform: scale and translate from tile to target
+    const sx0 = tileR.width / targetRect.width;
+    const sy0 = tileR.height / targetRect.height;
+    const dx0 = (tileR.left + tileR.width / 2) - (targetRect.left + targetRect.width / 2);
+    const dy0 = (tileR.top + tileR.height / 2) - (targetRect.top + targetRect.height / 2);
 
-    overlay.style.transform = `translate(${tx0}px, ${ty0}px) scale(${validSx0}, ${validSy0})`;
-    setTimeout(() => {
-      if (!overlay.parentElement) return;
-      overlay.style.opacity = '1';
+    overlay.style.transform = `translate(${dx0}px, ${dy0}px) scale(${sx0}, ${sy0})`;
+    
+    void overlay.offsetWidth; // force reflow
+
+    requestAnimationFrame(() => {
       overlay.style.transform = 'translate(0px, 0px) scale(1, 1)';
       rootRef.current?.setAttribute('data-enlarging', 'true');
-    }, 16);
-    const wantsResize = openedImageWidth || openedImageHeight;
-    if (wantsResize) {
-      const onFirstEnd = (ev: TransitionEvent) => {
-        if (ev.propertyName !== 'transform') return;
-        overlay.removeEventListener('transitionend', onFirstEnd);
-        const prevTransition = overlay.style.transition;
-        overlay.style.transition = 'none';
-        const isMobile = window.innerWidth <= 768;
-        let tempWidth = openedImageWidth || `${frameR.width}px`;
-        let tempHeight = openedImageHeight || `${frameR.height}px`;
-
-        if (isMobile) {
-          tempWidth = '85vw';
-          tempHeight = '85vw';
-        }
-
-        overlay.style.width = tempWidth;
-        overlay.style.height = tempHeight;
-        const newRect = overlay.getBoundingClientRect();
-        overlay.style.width = frameR.width + 'px';
-        overlay.style.height = frameR.height + 'px';
-        void overlay.offsetWidth;
-        overlay.style.transition = `left ${enlargeTransitionMs}ms ease, top ${enlargeTransitionMs}ms ease, width ${enlargeTransitionMs}ms ease, height ${enlargeTransitionMs}ms ease`;
-        const centeredLeft = frameR.left - mainR.left + (frameR.width - newRect.width) / 2;
-        const centeredTop = frameR.top - mainR.top + (frameR.height - newRect.height) / 2;
-        requestAnimationFrame(() => {
-          overlay.style.left = `${centeredLeft}px`;
-          overlay.style.top = `${centeredTop}px`;
-          overlay.style.width = tempWidth;
-          overlay.style.height = tempHeight;
-        });
-        const cleanupSecond = () => {
-          overlay.removeEventListener('transitionend', cleanupSecond);
-          overlay.style.transition = prevTransition;
-        };
-        overlay.addEventListener('transitionend', cleanupSecond, {
-          once: true
-        });
-      };
-      overlay.addEventListener('transitionend', onFirstEnd);
-    }
+    });
 
     // Add romantic labels
     const pairs = [

@@ -133,45 +133,53 @@ export default function CakePage() {
             <ellipse cx="200" cy="430" rx="170" ry="45" fill="url(#plateGradient)" />
             <ellipse cx="200" cy="422" rx="150" ry="35" fill="#f0f0f0" />
             
-            {/* Cake Base Layer */}
+            {/* Cake Base Layer - Strawberry */}
             <path d="M60 410 C60 450, 340 450, 340 410 L340 300 C340 340, 60 340, 60 300 Z" fill="url(#baseLayerGradient)" />
             <ellipse cx="200" cy="300" rx="140" ry="40" fill="#ffb3b3" />
             
-            {/* Cake Middle Layer */}
+            {/* Cake Middle Layer - Raspberry */}
             <path d="M85 300 C85 335, 315 335, 315 300 L315 210 C315 245, 85 245, 85 210 Z" fill="url(#midLayerGradient)" />
             <ellipse cx="200" cy="210" rx="115" ry="35" fill="#ff85a2" />
             
-            {/* Cake Top Layer */}
+            {/* Cake Top Layer - Vanilla */}
             <path d="M115 210 C115 240, 285 240, 285 210 L285 140 C285 170, 115 170, 115 140 Z" fill="url(#topLayerGradient)" />
             <ellipse cx="200" cy="140" rx="85" ry="25" fill="#ffffff" />
 
-            {/* Icing Drips - Detailed */}
-            <path d="M115 140 Q135 185 155 140 Q175 195 200 140 Q225 190 255 140 Q270 170 285 140" fill="white" />
-            <path d="M85 210 Q115 255 145 210 Q175 270 210 210 Q245 260 285 210 Q300 240 315 210" fill="#ff85a2" opacity="0.8" />
+            {/* Icing Drips - More Detailed */}
+            <path d="M115 140 Q130 180 145 145 Q160 190 175 140 Q190 200 210 145 Q230 185 250 140 Q270 175 285 140" fill="white" />
+            <path d="M85 210 Q105 260 125 215 Q150 280 180 210 Q215 270 245 215 Q275 260 315 210" fill="#ff85a2" opacity="0.6" />
+            
+            {/* Side Decorations - Gold Beads */}
+            {[...Array(12)].map((_, i) => (
+                <circle key={`bead1-${i}`} cx={200 + 138 * Math.cos(i * Math.PI / 6)} cy={370 + 20 * Math.sin(i * Math.PI / 6)} r="4" fill="url(#goldGradient)" />
+            ))}
+            {[...Array(10)].map((_, i) => (
+                <circle key={`bead2-${i}`} cx={200 + 113 * Math.cos(i * Math.PI / 5)} cy={270 + 15 * Math.sin(i * Math.PI / 5)} r="3.5" fill="url(#goldGradient)" />
+            ))}
 
-            {/* Sprinkles */}
+            {/* Sprinkles - Random Colored */}
+            {[...Array(25)].map((_, i) => (
+                <circle key={`s1-${i}`} cx={100 + Math.random() * 200} cy={320 + Math.random() * 60} r="3" fill={['#ff4d4d', '#ffeb3b', '#4caf50', '#2196f3', '#e91e63', '#ffffff'][i % 6]} opacity="0.6" />
+            ))}
             {[...Array(20)].map((_, i) => (
-                <circle key={`s1-${i}`} cx={100 + Math.random() * 200} cy={320 + Math.random() * 60} r="3" fill={['#ff4d4d', '#ffeb3b', '#4caf50', '#2196f3', '#e91e63'][i % 5]} opacity="0.7" />
-            ))}
-            {[...Array(15)].map((_, i) => (
-                <circle key={`s2-${i}`} cx={120 + Math.random() * 160} cy={220 + Math.random() * 50} r="2.5" fill={['#ff4d4d', '#ffeb3b', '#4caf50', '#2196f3', '#e91e63'][i % 5]} opacity="0.8" />
+                <circle key={`s2-${i}`} cx={120 + Math.random() * 160} cy={220 + Math.random() * 50} r="2.5" fill={['#ff4d4d', '#ffeb3b', '#4caf50', '#2196f3', '#e91e63', '#ffffff'][i % 6]} opacity="0.7" />
             ))}
 
-            {/* Strawberries / Decorations on top */}
+            {/* Fruits / Toppings */}
             {[
-                { x: 160, y: 130 },
-                { x: 240, y: 130 },
-                { x: 200, y: 115 },
-                { x: 140, y: 150 },
-                { x: 260, y: 150 }
+                { x: 160, y: 130, s: 1.1 },
+                { x: 240, y: 130, s: 1 },
+                { x: 200, y: 115, s: 1.2 },
+                { x: 140, y: 155, s: 0.9 },
+                { x: 260, y: 155, s: 0.9 }
             ].map((pos, i) => (
-                <g key={`deco-${i}`} transform={`translate(${pos.x}, ${pos.y})`}>
-                    <path d="M-10 0 Q 0 -15 10 0 Q 0 15 -10 0" fill="#e91e63" />
-                    <circle cx="0" cy="-2" r="1.5" fill="white" opacity="0.5" />
+                <g key={`deco-${i}`} transform={`translate(${pos.x}, ${pos.y}) scale(${pos.s})`}>
+                    <path d="M-12 0 Q 0 -18 12 0 Q 0 18 -12 0" fill="url(#berryGradient)" />
+                    <circle cx="-3" cy="-4" r="2" fill="white" opacity="0.4" />
                 </g>
             ))}
 
-            {/* Candles - Enhanced */}
+            {/* Candles - Enhanced with Glow */}
             {[
               { x: 150, y: 70, h: 55, color: "url(#candle1)", delay: 0 },
               { x: 175, y: 55, h: 65, color: "url(#candle2)", delay: 0.2 },
@@ -181,23 +189,24 @@ export default function CakePage() {
             ].map((candle, i) => (
               <g key={i} transform={`translate(${candle.x}, ${candle.y})`}>
                 <rect x="-5" y="20" width="12" height={candle.h} rx="3" fill={candle.color} stroke="rgba(0,0,0,0.1)" strokeWidth="1" />
+                <rect x="-5" y="20" width="4" height={candle.h} fill="white" opacity="0.2" />
                 <line x1="1" y1="20" x2="1" y2="12" stroke="#333" strokeWidth="1.5" />
                 <AnimatePresence>
                   {!blown && (
                     <motion.g
                       initial={{ scale: 1 }}
                       animate={{ 
-                        scale: [1, 1.25, 1], 
-                        rotate: [0, -5, 5, 0] 
+                        scale: [1, 1.3, 1], 
+                        rotate: [0, -4, 4, 0] 
                       }}
-                      transition={{ repeat: Infinity, duration: 0.4 + candle.delay, ease: "easeInOut" }}
+                      transition={{ repeat: Infinity, duration: 0.5 + candle.delay, ease: "easeInOut" }}
                       exit={{ scale: 0, opacity: 0 }}
                       className="origin-bottom"
                     >
                       {/* Inner Flame */}
-                      <path d="M1 12 C 1 12, -4 5, 1 -8 C 6 5, 1 12, 1 12 Z" fill="#ffcc00" className="drop-shadow-[0_0_15px_rgba(255,204,0,0.8)]" />
+                      <path d="M1 12 C 1 12, -4 5, 1 -10 C 6 5, 1 12, 1 12 Z" fill="#ffcc00" className="drop-shadow-[0_0_20px_rgba(255,204,0,0.9)]" />
                       {/* Outer Flame Glow */}
-                      <path d="M1 12 C 1 12, -7 2, 1 -12 C 9 2, 1 12, 1 12 Z" fill="#ff6600" opacity="0.4" />
+                      <path d="M1 12 C 1 12, -8 0, 1 -15 C 10 0, 1 12, 1 12 Z" fill="#ff6600" opacity="0.5" />
                     </motion.g>
                   )}
                 </AnimatePresence>
@@ -207,21 +216,30 @@ export default function CakePage() {
             {/* Gradients */}
             <defs>
               <linearGradient id="plateGradient" x1="200" y1="430" x2="200" y2="475" gradientUnits="userSpaceOnUse">
-                <stop stopColor="#e0e0e0" />
-                <stop offset="1" stopColor="#999999" />
+                <stop stopColor="#ffffff" />
+                <stop offset="1" stopColor="#d1d1d1" />
               </linearGradient>
               <linearGradient id="baseLayerGradient" x1="200" y1="300" x2="200" y2="410" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#ffb3b3" />
-                <stop offset="1" stopColor="#ff8080" />
+                <stop offset="1" stopColor="#ff4d4d" />
               </linearGradient>
               <linearGradient id="midLayerGradient" x1="200" y1="210" x2="200" y2="300" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#ff85a2" />
-                <stop offset="1" stopColor="#ff4d79" />
+                <stop offset="1" stopColor="#cc0044" />
               </linearGradient>
               <linearGradient id="topLayerGradient" x1="200" y1="140" x2="200" y2="210" gradientUnits="userSpaceOnUse">
                 <stop stopColor="#ffffff" />
-                <stop offset="1" stopColor="#f0f0f0" />
+                <stop offset="1" stopColor="#e8e8e8" />
               </linearGradient>
+              <radialGradient id="goldGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#fff9c4" />
+                <stop offset="50%" stopColor="#fbc02d" />
+                <stop offset="100%" stopColor="#f57f17" />
+              </radialGradient>
+              <radialGradient id="berryGradient" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stopColor="#ff4081" />
+                <stop offset="100%" stopColor="#880e4f" />
+              </radialGradient>
               <linearGradient id="candle1" x1="0" y1="0" x2="10" y2="0">
                 <stop stopColor="#ffccd5" />
                 <stop offset="1" stopColor="#ff8095" />
@@ -237,15 +255,24 @@ export default function CakePage() {
         <AnimatePresence>
           {blown && (
             <motion.div 
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1, duration: 1 }}
-              className="mt-8 md:mt-12 bg-white/5 backdrop-blur-xl p-6 md:p-8 rounded-2xl border border-white/10 text-center max-w-sm md:max-w-md w-full shadow-2xl"
+              transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
+              className="mt-8 md:mt-12 bg-white/5 backdrop-blur-2xl p-8 md:p-10 rounded-3xl border border-white/10 text-center max-w-lg w-full shadow-[0_20px_50px_rgba(0,0,0,0.5)] space-y-6"
             >
-              <h3 className="text-xl md:text-2xl font-playfair text-white mb-3 md:mb-4 italic">A Secret Message</h3>
-              <p className="text-sm md:text-base text-white/80 font-serif leading-relaxed italic">
-                "Selamat bertambah usia, manusia favoritku. Terima kasih telah lahir ke dunia dan menjadi bagian terindah dalam ceritaku. Semoga setiap langkahmu selalu diiringi tawa dan kebahagiaan."
-              </p>
+              <div className="space-y-4">
+                <h3 className="text-2xl md:text-3xl font-playfair text-white italic font-bold">A Heartfelt Prayer</h3>
+                <div className="w-16 h-0.5 bg-red-500/50 mx-auto rounded-full" />
+                <p className="text-base md:text-lg text-white/90 font-serif leading-relaxed italic px-2">
+                  "Ya Allah, limpahkanlah keberkahan, kesehatan, dan kebahagiaan untuknya di usia yang baru ini. Jadikanlah setiap langkahnya selalu dalam lindungan-Mu, dan semoga hatinya senantiasa dipenuhi dengan cahaya syukur serta kasih sayang."
+                </p>
+              </div>
+              
+              <div className="pt-4 border-t border-white/5">
+                <p className="text-sm md:text-base text-white/60 font-serif italic">
+                  "Terima kasih telah menjadi bagian terindah dalam ceritaku. Selamat hari lahir, Kak Arey."
+                </p>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
