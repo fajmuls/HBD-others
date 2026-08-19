@@ -1,0 +1,10 @@
+{
+  "name": "Valentine's Day Experience",
+  "description": "An interactive, multi-step Valentine's Day web application featuring a romantic story, tic-tac-toe, a love meter, an interactive cake blowing experience, and a 3D memory gallery.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -50,21 +50,21 @@ const LoveModeStep = ({ onComplete }: { onComplete: () => void }) => {
 
     return (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 1.05, filter: 'blur(10px)' }} className="flex flex-col items-center justify-center relative z-10">
-            <div className={`backdrop-blur-2xl p-16 rounded-[3rem] transition-all duration-1000 ease-in-out flex flex-col items-center space-y-12 border border-white/10 ${isOn ? 'bg-red-500/10 shadow-[0_0_80px_rgba(239,68,68,0.2)] border-red-500/20' : 'bg-white/5 shadow-2xl'}`}>
+            <div className={`backdrop-blur-2xl p-12 rounded-[3rem] transition-all duration-1000 ease-in-out flex flex-col items-center space-y-10 border border-white/10 ${isOn ? 'bg-red-500/10 shadow-[0_0_80px_rgba(239,68,68,0.2)] border-red-500/20' : 'bg-white/5 shadow-2xl'}`}>
                 <div className="relative">
                     <motion.div animate={isOn ? { scale: [1, 1.15, 1], filter: ['drop-shadow(0 0 0px rgba(239,68,68,0))', 'drop-shadow(0 0 20px rgba(239,68,68,0.6))', 'drop-shadow(0 0 0px rgba(239,68,68,0))'] } : {}} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}>
-                        <Heart className={`w-32 h-32 transition-all duration-1000 ${isOn ? 'text-red-500 fill-red-500' : 'text-white/10'}`} />
+                        <Heart className={`w-24 h-24 transition-all duration-1000 ${isOn ? 'text-red-500 fill-red-500' : 'text-white/10'}`} />
                     </motion.div>
                 </div>
-                <div className="flex flex-col items-center space-y-8">
-                    <span className={`text-6xl md:text-7xl font-playfair transition-colors duration-1000 ${isOn ? 'text-white' : 'text-white/40'}`}>Love mode</span>
-                    <button onClick={() => setIsOn(!isOn)} className={`group relative w-40 h-20 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] p-2 focus:outline-none ${isOn ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]' : 'bg-white/10'}`}>
-                        <motion.div animate={{ x: isOn ? 80 : 0 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="w-16 h-16 bg-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.2)] flex items-center justify-center pointer-events-none">
-                            <Heart size={28} className={`transition-colors duration-500 ${isOn ? "text-red-500 fill-red-500" : "text-gray-300"}`} />
+                <div className="flex flex-col items-center space-y-6">
+                    <span className={`text-5xl font-playfair transition-colors duration-1000 ${isOn ? 'text-white' : 'text-white/40'}`}>Love mode</span>
+                    <button onClick={() => setIsOn(!isOn)} className={`group relative w-32 h-16 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] p-1.5 focus:outline-none ${isOn ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]' : 'bg-white/10'}`}>
+                        <motion.div animate={{ x: isOn ? 64 : 0 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="w-13 h-13 bg-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.2)] flex items-center justify-center pointer-events-none" style={{ width: '52px', height: '52px' }}>
+                            <Heart size={24} className={`transition-colors duration-500 ${isOn ? "text-red-500 fill-red-500" : "text-gray-300"}`} />
                         </motion.div>
                         <AnimatePresence>
-                            {!isOn && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute right-8 top-1/2 -translate-y-1/2 text-xs font-bold uppercase tracking-[0.2em] text-white/30">off</motion.span>}
-                            {isOn && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute left-8 top-1/2 -translate-y-1/2 text-xs font-bold uppercase tracking-[0.2em] text-white/80">on</motion.span>}
+                            {!isOn && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">off</motion.span>}
+                            {isOn && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute left-6 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/80">on</motion.span>}
                         </AnimatePresence>
                     </button>
                 </div>
@@ -126,7 +126,7 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
 
     return (
         <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center space-y-10 relative z-10">
-            <h2 className="text-5xl font-playfair text-white text-center drop-shadow-lg max-w-sm whitespace-pre-line leading-tight">{winner === 'X' ? "Kamu Memenangkan" : message}</h2>
+            <h2 className="text-4xl font-playfair text-white text-center drop-shadow-lg max-w-xs whitespace-pre-line leading-tight">{winner === 'X' ? "Kamu Memenangkan" : message}</h2>
             <div className="grid grid-cols-3 gap-3 p-4 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
                 {board.map((square, i) => (
                     <button key={i} onClick={() => handleSquareClick(i)} className="w-20 h-20 sm:w-24 sm:h-24 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all duration-300 group">
@@ -176,9 +176,9 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
                     <defs><linearGradient id="loveGradient" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stopColor="#ef4444" /><stop offset="100%" stopColor="#ec4899" /></linearGradient></defs>
                 </svg>
                 <div className="z-10 flex flex-col items-center pb-4">
-                    <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}><Heart className="w-20 h-20 text-red-500 fill-red-500 mb-2" /></motion.div>
-                    <div className="text-7xl font-black text-white font-mono tracking-tighter">{progress}<span className="text-red-400 text-4xl">%</span></div>
-                    <span className="text-3xl text-white/60 font-playfair italic mt-2 tracking-widest">Love Intensity</span>
+                    <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ repeat: Infinity, duration: 2 }}><Heart className="w-16 h-16 text-red-500 fill-red-500 mb-2" /></motion.div>
+                    <div className="text-6xl font-black text-white font-mono tracking-tighter">{progress}<span className="text-red-400 text-3xl">%</span></div>
+                    <span className="text-2xl text-white/60 font-playfair italic mt-2 tracking-widest">Love Intensity</span>
                 </div>
             </div>
             <div className="w-full h-2 bg-white/10 rounded-full overflow-hidden border border-white/5"><motion.div className="h-full bg-gradient-to-r from-red-500 to-pink-500" animate={{ width: `${progress}%` }} /></div>
@@ -200,6 +200,12 @@ const CakeStep = ({ onComplete }: { onComplete: () => void }) => {
 
         const initMic = async () => {
             try {
+                // Feature detection
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    console.log("Media devices API not supported");
+                    return;
+                }
+
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
                 setMicEnabled(true);
                 audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -227,7 +233,8 @@ const CakeStep = ({ onComplete }: { onComplete: () => void }) => {
                 };
                 checkBlow();
             } catch (err) {
-                console.error("Mic access denied or error:", err);
+                console.log("Mic access denied or error:", err);
+                // We fallback gracefully, user can just click the cake
             }
         };
         initMic();
@@ -326,9 +333,9 @@ const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(20px)' }} className="flex items-center justify-center p-8 relative z-10 w-full">
-            <h1 className="text-6xl sm:text-8xl md:text-9xl font-playfair text-white text-center leading-tight">
+            <h1 className="text-5xl sm:text-8xl font-playfair text-white text-center leading-tight">
                 {displayedText}
-                <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="inline-block w-2 sm:w-4 h-16 sm:h-24 md:h-32 bg-red-500 ml-2 align-middle" />
+                <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="inline-block w-2 sm:w-4 h-12 sm:h-20 bg-red-500 ml-2 align-middle" />
             </h1>
         </motion.div>
     );

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookHeart, Image as ImageIcon } from 'lucide-react';
+import { Home, BookHeart, Image as ImageIcon, Gift } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Navigation() {
@@ -10,6 +10,7 @@ export default function Navigation() {
   
   const links = [
     { path: '/', icon: Home, label: 'Home' },
+    { path: '/cake', icon: Gift, label: 'Cake' },
     { path: '/letter', icon: BookHeart, label: 'Story' },
     { path: '/memories', icon: ImageIcon, label: 'Memories' },
   ];
