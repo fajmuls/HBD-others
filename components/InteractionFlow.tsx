@@ -6,11 +6,23 @@ import { Heart, X, Circle } from 'lucide-react';
 
 const playAudio = (path: string) => {
     try {
+        const fallbacks: Record<string, string> = {
+            'click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3',
+            'tictactoe-click.mp3': 'https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3',
+            'tictactoe-win.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3',
+            'love-mode.mp3': 'https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3'
+        };
         const audio = new Audio(`/sfx/${path}`);
         audio.volume = 0.5;
-        audio.play().catch(() => console.log('Audio play blocked by browser until user interaction.'));
+        audio.play().catch(() => {
+            if (fallbacks[path]) {
+                const fb = new Audio(fallbacks[path]);
+                fb.volume = 0.3;
+                fb.play().catch(() => {});
+            }
+        });
     } catch (e) {
-        // Safe to ignore if file not found
+        // Safe to ignore
     }
 };
 
@@ -67,10 +79,10 @@ const LoveModeStep = ({ onComplete }: { onComplete: () => void }) => {
                     </motion.div>
                 </div>
                 <div className="flex flex-col items-center space-y-6">
-                    <span className={`text-5xl font-playfair transition-colors duration-1000 ${isOn ? 'text-white' : 'text-white/40'}`}>Love mode</span>
-                    <button onClick={() => setIsOn(!isOn)} className={`group relative w-32 h-16 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] p-1.5 focus:outline-none ${isOn ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]' : 'bg-white/10'}`}>
-                        <motion.div animate={{ x: isOn ? 64 : 0 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="w-13 h-13 bg-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.2)] flex items-center justify-center pointer-events-none" style={{ width: '52px', height: '52px' }}>
-                            <Heart size={24} className={`transition-colors duration-500 ${isOn ? "text-red-500 fill-red-500" : "text-gray-300"}`} />
+                    <span className={`text-3xl md:text-5xl font-playfair transition-colors duration-1000 ${isOn ? 'text-white' : 'text-white/40'}`}>Love mode</span>
+                    <button onClick={() => setIsOn(!isOn)} className={`group relative w-24 h-12 md:w-32 md:h-16 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] p-1.5 focus:outline-none ${isOn ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]' : 'bg-white/10'}`}>
+                        <motion.div animate={{ x: isOn ? (window.innerWidth < 768 ? 48 : 64) : 0 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="w-9 h-9 md:w-13 md:h-13 bg-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.2)] flex items-center justify-center pointer-events-none" style={{ width: 'calc(100% / 2.5)', height: '100%' }}>
+                            <Heart size={18} className={`md:size-24 transition-colors duration-500 ${isOn ? "text-red-500 fill-red-500" : "text-gray-300"}`} />
                         </motion.div>
                         <AnimatePresence>
                             {!isOn && <motion.span initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute right-6 top-1/2 -translate-y-1/2 text-[10px] font-bold uppercase tracking-[0.2em] text-white/30">off</motion.span>}
@@ -134,25 +146,25 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
     }, [winner, onComplete]);
 
     return (
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center space-y-10 relative z-10">
-            <h2 className="text-4xl font-playfair text-white text-center drop-shadow-lg max-w-xs whitespace-pre-line leading-tight">{winner === 'X' ? "Kamu Memenangkan" : message}</h2>
-            <div className="grid grid-cols-3 gap-3 p-4 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center space-y-6 md:space-y-10 relative z-10 px-4">
+            <h2 className="text-2xl md:text-4xl font-playfair text-white text-center drop-shadow-lg max-w-xs whitespace-pre-line leading-tight">{winner === 'X' ? "Kamu Memenangkan" : message}</h2>
+            <div className="grid grid-cols-3 gap-2 md:gap-3 p-3 md:p-4 bg-white/5 backdrop-blur-md rounded-3xl border border-white/10 shadow-2xl">
                 {board.map((square, i) => (
-                    <button key={i} onClick={() => handleSquareClick(i)} className="w-20 h-20 sm:w-24 sm:h-24 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all duration-300 group">
+                    <button key={i} onClick={() => handleSquareClick(i)} className="w-16 h-16 sm:w-24 sm:h-24 bg-white/10 rounded-2xl flex items-center justify-center border border-white/10 hover:bg-white/20 transition-all duration-300 group">
                         <AnimatePresence mode="wait">
                             {square === 'X' ? (
                                 <motion.div key={winner === 'X' ? "heart" : "x"} initial={{ scale: 0 }} animate={{ scale: 1 }} transition={winner === 'X' ? { delay: i * 0.15, type: 'spring' } : {}}>
-                                    {winner === 'X' ? <Heart className="w-12 h-12 text-red-500 fill-red-500 filter drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" /> : <X className="w-12 h-12 text-white/80" />}
+                                    {winner === 'X' ? <Heart className="w-8 h-8 md:w-12 md:h-12 text-red-500 fill-red-500 filter drop-shadow-[0_0_10px_rgba(239,68,68,0.8)]" /> : <X className="w-8 h-8 md:w-12 md:h-12 text-white/80" />}
                                 </motion.div>
                             ) : square === 'O' ? (
-                                <motion.div key="o" initial={{ scale: 0 }} animate={{ scale: 1 }}><Circle className="w-12 h-12 text-pink-300 opacity-50" /></motion.div>
+                                <motion.div key="o" initial={{ scale: 0 }} animate={{ scale: 1 }}><Circle className="w-8 h-8 md:w-12 md:h-12 text-pink-300 opacity-50" /></motion.div>
                             ) : null}
                         </AnimatePresence>
                     </button>
                 ))}
             </div>
             <AnimatePresence>
-                {winner === 'X' && <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-4xl font-playfair text-white text-center drop-shadow-lg mt-4">Hatiku</motion.h2>}
+                {winner === 'X' && <motion.h2 initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-2xl md:text-4xl font-playfair text-white text-center drop-shadow-lg mt-2">Hatiku</motion.h2>}
             </AnimatePresence>
         </motion.div>
     );
@@ -180,8 +192,8 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
     }, [onComplete]);
 
     return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center space-y-12 w-full max-w-sm px-6 relative z-10">
-            <div className="relative w-64 h-64 flex items-center justify-center">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center space-y-8 md:space-y-12 w-full max-w-sm px-6 relative z-10">
+            <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center">
                 {/* Background Heart (Empty) */}
                 <Heart className="absolute w-full h-full text-white/5" fill="currentColor" strokeWidth={1} />
                 
@@ -191,7 +203,7 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
                         animate={{ scale: [1, 1.05, 1] }} 
                         transition={{ repeat: Infinity, duration: 0.8, ease: "easeInOut" }}
                     >
-                        <Heart className="w-64 h-64 text-red-500 fill-red-500 filter drop-shadow-[0_0_20px_rgba(239,68,68,0.4)]" />
+                        <Heart className="w-48 h-48 md:w-64 md:h-64 text-red-500 fill-red-500 filter drop-shadow-[0_0_20px_rgba(239,68,68,0.4)]" />
                     </motion.div>
                 </div>
 
@@ -201,19 +213,19 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
                         key={progress}
                         initial={{ scale: 0.8, opacity: 0 }} 
                         animate={{ scale: 1, opacity: 1 }}
-                        className="text-5xl font-black text-white font-mono tracking-tighter"
+                        className="text-3xl md:text-5xl font-black text-white font-mono tracking-tighter"
                     >
-                        {progress}<span className="text-red-400 text-2xl">%</span>
+                        {progress}<span className="text-red-400 text-xl md:text-2xl">%</span>
                     </motion.div>
                 </div>
             </div>
 
-            <div className="w-full space-y-3">
-                <div className="flex justify-between text-xs font-bold uppercase tracking-widest text-white/30">
+            <div className="w-full space-y-3 px-4">
+                <div className="flex justify-between text-[10px] md:text-xs font-bold uppercase tracking-widest text-white/30">
                     <span>Intensity</span>
                     <span>{progress === 100 ? "MAXIMUM" : "CALCULATING..."}</span>
                 </div>
-                <div className="w-full h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
+                <div className="w-full h-1 md:h-1.5 bg-white/5 rounded-full overflow-hidden border border-white/5">
                     <motion.div 
                         className="h-full bg-gradient-to-r from-red-600 via-pink-500 to-red-600" 
                         animate={{ width: `${progress}%` }} 
@@ -222,8 +234,8 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
                 </div>
             </div>
             
-            <p className="text-sm text-white/40 font-playfair italic text-center animate-pulse">
-                "My heart beats faster when I'm with you..."
+            <p className="text-xs md:text-sm text-white/40 font-playfair italic text-center animate-pulse px-6 leading-relaxed">
+                &quot;My heart beats faster when I&apos;m with you...&quot;
             </p>
         </motion.div>
     );
@@ -231,7 +243,7 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
 
 // --- Step 4: Typewriter ---
 const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
-    const text = "Happy Birthday Arya Rizky Munandar!!!!";
+    const text = "Happy Birthday Kak Arey";
     const [displayedText, setDisplayedText] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
 
@@ -255,9 +267,9 @@ const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, filter: 'blur(20px)' }} className="flex items-center justify-center p-8 relative z-10 w-full">
-            <h1 className="text-5xl sm:text-8xl font-playfair text-white text-center leading-tight">
+            <h1 className="text-4xl sm:text-7xl md:text-8xl font-playfair text-white text-center leading-tight">
                 {displayedText}
-                <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="inline-block w-2 sm:w-4 h-12 sm:h-20 bg-red-500 ml-2 align-middle" />
+                <motion.span animate={{ opacity: [0, 1, 0] }} transition={{ repeat: Infinity, duration: 0.8 }} className="inline-block w-1.5 md:w-4 h-10 md:h-20 bg-red-500 ml-2 align-middle" />
             </h1>
         </motion.div>
     );

@@ -20,6 +20,14 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   title: "Happy Birthday, Arya Rizky Munandar ❤️",
   description: "A special birthday gift for Arya Rizky Munandar ❤️",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/favicon.ico' },
+    ],
+  },
 };
 
 export default function RootLayout({

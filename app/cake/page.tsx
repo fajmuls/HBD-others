@@ -66,7 +66,11 @@ export default function CakePage() {
     try {
       const audio = new Audio('/sfx/blow.mp3');
       audio.volume = 0.6;
-      audio.play().catch(e => console.log('Silakan upload file sfx/blow.mp3'));
+      audio.play().catch(e => {
+        const fallback = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
+        fallback.volume = 0.3;
+        fallback.play().catch(() => {});
+      });
     } catch (e) {}
 
     // Confetti effect

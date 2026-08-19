@@ -8,7 +8,11 @@ const playPageFlip = () => {
     try {
         const audio = new Audio('/sfx/page-flip.mp3');
         audio.volume = 0.5;
-        audio.play().catch(e => console.log('Silakan upload file sfx/page-flip.mp3 terlebih dahulu.'));
+        audio.play().catch(e => {
+            const fallback = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
+            fallback.volume = 0.3;
+            fallback.play().catch(() => {});
+        });
     } catch (e) {
         // Ignore
     }
@@ -75,7 +79,7 @@ export default function LetterPage() {
             animate={{ rotateY: 0, opacity: 1 }}
             exit={{ rotateY: -90, opacity: 0 }}
             transition={{ duration: 0.6, ease: "easeInOut" }}
-            className="bg-[#fefaf3] text-[#333] p-8 md:p-16 rounded-r-2xl rounded-l-md shadow-2xl min-h-[450px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-visible flex flex-col"
+            className="bg-[#fefaf3] text-[#333] p-6 md:p-12 rounded-r-2xl rounded-l-md shadow-2xl min-h-[400px] md:min-h-[550px] border-l-[6px] border-[#6b4226] relative overflow-visible flex flex-col"
           >
             {/* Texture kertas ringan */}
             <div className="absolute inset-0 opacity-15 pointer-events-none" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/paper.png')" }} />
@@ -83,8 +87,8 @@ export default function LetterPage() {
             {/* Lined Paper Effect */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.05]" style={{ background: 'repeating-linear-gradient(transparent, transparent 31px, #333 32px)' }} />
 
-            <h2 className="text-2xl md:text-4xl font-playfair font-bold text-[#4a2c16] mb-6 relative z-10 border-b border-[#4a2c16]/10 pb-2 italic">{pages[currentPage].title}</h2>
-            <p className="text-lg md:text-xl font-serif leading-loose text-gray-700 whitespace-pre-wrap relative z-10 flex-grow">
+            <h2 className="text-xl md:text-3xl font-playfair font-bold text-[#4a2c16] mb-4 relative z-10 border-b border-[#4a2c16]/10 pb-2 italic">{pages[currentPage].title}</h2>
+            <p className="text-base md:text-lg font-serif leading-relaxed md:leading-loose text-gray-700 whitespace-pre-wrap relative z-10 flex-grow">
                 {pages[currentPage].content}
             </p>
             
@@ -95,7 +99,7 @@ export default function LetterPage() {
                 initial={{ opacity: 0, scale: 0.8, rotate: 0 }}
                 animate={{ opacity: 1, scale: 1, rotate: polaroid.rotation.includes('-') ? -5 : 5 }}
                 transition={{ delay: 0.4 + (idx * 0.2), type: 'spring' }}
-                className={`absolute ${polaroid.position} w-32 md:w-48 bg-white p-2 pb-8 md:p-3 md:pb-12 shadow-2xl border border-black/5 z-20 pointer-events-none`}
+                className={`absolute ${polaroid.position} w-24 md:w-40 bg-white p-1.5 pb-6 md:p-3 md:pb-10 shadow-2xl border border-black/5 z-20 pointer-events-none`}
               >
                 <div className="w-full aspect-square bg-white overflow-hidden relative border border-black/5">
                   <img src={polaroid.src} alt="Memory" className="absolute inset-0 w-full h-full object-cover transition-all" />

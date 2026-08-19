@@ -876,12 +876,19 @@ export default function DomeGallery({
       top: 50%;
       transform: translateY(-50%);
       color: white;
-      font-size: 3rem;
+      font-size: 2.5rem;
+      font-weight: 700;
       opacity: 0;
       transition: all 500ms ease-out;
       z-index: 40;
       pointer-events: none;
-      text-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+      text-shadow: 0 0 20px rgba(255, 105, 180, 0.8), 0 0 40px rgba(0, 0, 0, 0.5);
+    }
+    
+    @media (min-width: 768px) {
+      .romantic-label {
+        font-size: 3.5rem;
+      }
     }
 
     .label-left {
@@ -896,19 +903,19 @@ export default function DomeGallery({
 
     @media (max-width: 768px) {
       .romantic-label {
-        font-size: 2.2rem;
+        font-size: 1.8rem;
         left: 0;
         right: 0;
         text-align: center;
         width: 100%;
       }
       .label-left {
-        top: 12%;
+        top: 15%;
         transform: translateY(-20px);
       }
       .label-right {
         top: auto;
-        bottom: 12%;
+        bottom: 15%;
         transform: translateY(20px);
       }
     }
