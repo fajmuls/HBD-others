@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import DomeGallery from '@/components/DomeGallery';
 import InteractionFlow from '@/components/InteractionFlow';
 import Navigation from '@/components/Navigation';
@@ -8,14 +8,7 @@ import Navigation from '@/components/Navigation';
 export default function Home() {
   const [showGallery, setShowGallery] = useState(false);
 
-  useEffect(() => {
-    if (localStorage.getItem('valentineFlowCompleted') === 'true') {
-      setShowGallery(true);
-    }
-  }, []);
-
   const handleFlowComplete = () => {
-    localStorage.setItem('valentineFlowCompleted', 'true');
     setShowGallery(true);
   };
 
