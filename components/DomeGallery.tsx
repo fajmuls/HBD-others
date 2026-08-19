@@ -468,7 +468,7 @@ export default function DomeGallery({
       focusedElRef.current = null;
       rootRef.current?.removeAttribute('data-enlarging');
       openingRef.current = false;
-      viewerRef.current?.querySelectorAll('.romantic-label').forEach(el => el.remove());
+      viewerRef.current?.querySelectorAll('.romantic-label, .close-btn').forEach(el => el.remove());
       return;
     }
 
@@ -531,6 +531,7 @@ export default function DomeGallery({
     const cleanup = () => {
       animatingOverlay.remove();
       originalTilePositionRef.current = null;
+      viewerRef.current?.querySelectorAll('.close-btn').forEach(el => el.remove());
 
       if (refDiv) refDiv.remove();
       parent.style.transition = 'none';
@@ -646,6 +647,16 @@ export default function DomeGallery({
     overlay.appendChild(img);
 
     overlay.addEventListener('click', close);
+    
+    const closeBtn = document.createElement('div');
+    closeBtn.className = 'close-btn';
+    closeBtn.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+    closeBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      close();
+    });
+    viewerRef.current!.appendChild(closeBtn);
+
     viewerRef.current!.appendChild(overlay);
     const tx0 = tileR.left - frameR.left;
     const ty0 = tileR.top - frameR.top;
@@ -776,7 +787,6 @@ export default function DomeGallery({
       margin: auto;
       perspective: calc(var(--radius) * 2.5);
       perspective-origin: 50% 50%;
-      transform: translateY(20px);
     }
     
     .sphere {
@@ -825,6 +835,33 @@ export default function DomeGallery({
       box-shadow: 0 30px 60px rgba(0,0,0,0.6);
       cursor: pointer;
       box-sizing: border-box;
+      pointer-events: auto !important;
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(8px);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      cursor: pointer;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 300ms, background 300ms;
+      pointer-events: auto;
+    }
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+    .sphere-root[data-enlarging="true"] .close-btn {
+      opacity: 1;
     }
     
     .romantic-label {
