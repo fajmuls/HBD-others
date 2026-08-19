@@ -109,7 +109,7 @@ export default function CakePage() {
       >
         <div className="mb-16 text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-playfair text-white drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]">
-            {blown ? "Happy Valentine's Day! ✨" : "Make a Wish..."}
+            {blown ? "Happy Birthday! ✨" : "Make a Wish..."}
           </h1>
           <p className="text-white/60 font-serif italic text-lg md:text-xl">
             {blown ? "Semoga semua harapanmu terkabul." : (micEnabled ? "Tiup lilinnya dari mic perangkatmu!" : "Ketuk lilinnya untuk meniup!")}
@@ -235,7 +235,7 @@ export default function CakePage() {
             >
               <h3 className="text-2xl font-playfair text-white mb-4">A Secret Message</h3>
               <p className="text-white/80 font-serif leading-relaxed italic">
-                "Setiap tahun berlalu, dan aku semakin bersyukur memilikimu. Terima kasih sudah menjadi bagian terindah dari setiap hariku."
+                "Selamat bertambah usia, manusia favoritku. Terima kasih telah lahir ke dunia dan menjadi bagian terindah dalam ceritaku. Semoga setiap langkahmu selalu diiringi tawa dan kebahagiaan."
               </p>
             </motion.div>
           )}

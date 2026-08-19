@@ -19,29 +19,29 @@ const pages = [
     title: "Untuk Kamu,",
     content: "Hai... Aku tahu mungkin ini terlihat sederhana, tapi aku membuatkan ini khusus untukmu. Sebuah tempat kecil di mana kita bisa menyimpan memori, dan aku bisa menyusun kata-kata ini.",
     polaroids: [
-      { src: "/1.jpeg", position: "top-[-30px] right-[-20px]", rotation: "rotate-[8deg]" }
+      { src: "/1.jpeg", position: "bottom-[20px] right-[-40px]", rotation: "rotate-[8deg]" }
     ]
   },
   {
     title: "Halaman Kedua",
     content: "Setiap baris kode di sini ditulis dengan memikirkanmu. Lucu ya, bagaimana teknologi bisa menjadi cara lain untuk mengekspresikan perasaan dan cerita kita.",
     polaroids: [
-      { src: "/2.jpeg", position: "bottom-[-20px] left-[-30px]", rotation: "-rotate-[6deg]" }
+      { src: "/2.jpeg", position: "bottom-[20px] left-[-30px]", rotation: "-rotate-[6deg]" }
     ]
   },
   {
     title: "Sebuah Pengingat",
     content: "Meski mungkin kadang kita sibuk atau terpisah jarak, aku harap tempat kecil ini bisa jadi pengingat: betapa kamu berarti buatku.",
     polaroids: [
-      { src: "/3.jpeg", position: "top-[20%] right-[-40px]", rotation: "rotate-[12deg]" }
+      { src: "/3.jpeg", position: "bottom-[40px] right-[-50px]", rotation: "rotate-[12deg]" }
     ]
   },
   {
     title: "Selamanya",
     content: "Semoga hari-harimu selalu dipenuhi kebahagiaan. Dan ingat, kamu selalu memiliki tempat yang sangat spesial di hatiku.\n\nLove ❤️",
     polaroids: [
-      { src: "/4.jpeg", position: "top-[-40px] left-[-20px]", rotation: "-rotate-[10deg]" },
-      { src: "/5.jpeg", position: "bottom-[-30px] right-[-20px]", rotation: "rotate-[5deg]" }
+      { src: "/4.jpeg", position: "bottom-[20px] left-[-30px]", rotation: "-rotate-[10deg]" },
+      { src: "/5.jpeg", position: "bottom-[60px] right-[-30px]", rotation: "rotate-[5deg]" }
     ]
   }
 ];
@@ -92,9 +92,11 @@ export default function LetterPage() {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.4 + (idx * 0.2), type: 'spring' }}
-                className={`absolute ${polaroid.position} ${polaroid.rotation} w-32 md:w-40 p-3 bg-white shadow-xl border border-gray-200 z-20 pointer-events-none`}
+                className={`absolute ${polaroid.position} ${polaroid.rotation} w-32 md:w-40 bg-white p-3 pb-8 md:p-4 md:pb-12 shadow-2xl border border-gray-100 z-20 pointer-events-none`}
               >
-                <img src={polaroid.src} alt="Memory polaroid" className="w-full h-auto aspect-square object-cover" />
+                <div className="w-full aspect-square bg-gray-100 overflow-hidden relative">
+                  <img src={polaroid.src} alt="Memory polaroid" className="absolute inset-0 w-full h-full object-cover" />
+                </div>
               </motion.div>
             ))}
 

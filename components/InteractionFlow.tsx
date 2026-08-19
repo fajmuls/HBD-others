@@ -1,14 +1,14 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, X, Circle, Flame, Sparkles } from 'lucide-react';
+import { Heart, X, Circle } from 'lucide-react';
 
 const playAudio = (path: string) => {
     try {
         const audio = new Audio(`/sfx/${path}`);
         audio.volume = 0.5;
-        audio.play().catch(e => console.log('Audio play blocked by browser until user interaction.'));
+        audio.play().catch(() => console.log('Audio play blocked by browser until user interaction.'));
     } catch (e) {
         // Safe to ignore if file not found
     }
@@ -16,17 +16,27 @@ const playAudio = (path: string) => {
 
 // --- Background Particles ---
 const BackgroundHearts = () => {
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => setMounted(true), []);
-    if (!mounted) return null;
+    const [hearts, setHearts] = useState<{id: number, x: string, duration: number, delay: number}[]>([]);
+    
+    useEffect(() => {
+        const initialHearts = [...Array(10)].map((_, i) => ({
+            id: i,
+            x: `${(i * 10) + Math.random() * 5}%`,
+            duration: 15 + Math.random() * 10,
+            delay: i * 2
+        }));
+        setHearts(initialHearts);
+    }, []);
+
+    if (hearts.length === 0) return null;
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(10)].map((_, i) => (
+            {hearts.map((h) => (
                 <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: '110vh', x: `${(i * 10) + Math.random() * 5}%`, scale: 0.5 }}
+                    key={h.id}
+                    initial={{ opacity: 0, y: '110vh', x: h.x, scale: 0.5 }}
                     animate={{ opacity: [0, 0.2, 0], y: '-10vh', rotate: [0, 180], scale: [0.5, 0.8, 0.5] }}
-                    transition={{ duration: 15 + Math.random() * 10, repeat: Infinity, delay: i * 2, ease: "linear" }}
+                    transition={{ duration: h.duration, repeat: Infinity, delay: h.delay, ease: "linear" }}
                     className="absolute text-red-500/10"
                 >
                     <Heart size={30} fill="currentColor" />
@@ -78,7 +88,8 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
     const [board, setBoard] = useState(Array(9).fill(null));
     const [isUserTurn, setIsUserTurn] = useState(true);
     const [winner, setWinner] = useState<string | null>(null);
-    const [message, setMessage] = useState("Let's play a little game...");
+
+    const message = winner === 'X' ? "Kamu Memenangkan" : winner === 'draw' ? "Seri! Coba lagi yaa ❤️" : winner === 'O' ? "Hampir! Sekali lagi..." : "Let's play a little game...";
 
     const checkWinner = useCallback((squares: (string | null)[]) => {
         const lines = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
@@ -115,11 +126,9 @@ const TicTacToeStep = ({ onComplete }: { onComplete: () => void }) => {
 
     useEffect(() => {
         if (winner === 'X') {
-            setMessage("Kamu Memenangkan");
             playAudio('tictactoe-win.mp3');
             setTimeout(() => onComplete(), 3500);
         } else if (winner === 'O' || winner === 'draw') {
-            setMessage(winner === 'draw' ? "Seri! Coba lagi yaa ❤️" : "Hampir! Sekali lagi...");
             setTimeout(() => { setBoard(Array(9).fill(null)); setWinner(null); setIsUserTurn(true); }, 1500);
         }
     }, [winner, onComplete]);
@@ -186,128 +195,7 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
     );
 };
 
-// --- Step 4: Cake Blowing ---
-const CakeStep = ({ onComplete }: { onComplete: () => void }) => {
-    const [blown, setBlown] = useState(false);
-    const [micEnabled, setMicEnabled] = useState(false);
-    const [blowLevel, setBlowLevel] = useState(0);
-
-    useEffect(() => {
-        let audioContext: AudioContext;
-        let microphone: MediaStreamAudioSourceNode;
-        let analyser: AnalyserNode;
-        let animationFrame: number;
-
-        const initMic = async () => {
-            try {
-                // Feature detection
-                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                    console.log("Media devices API not supported");
-                    return;
-                }
-
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-                setMicEnabled(true);
-                audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-                analyser = audioContext.createAnalyser();
-                microphone = audioContext.createMediaStreamSource(stream);
-                microphone.connect(analyser);
-                analyser.fftSize = 256;
-                const bufferLength = analyser.frequencyBinCount;
-                const dataArray = new Uint8Array(bufferLength);
-
-                const checkBlow = () => {
-                    analyser.getByteFrequencyData(dataArray);
-                    let sum = 0;
-                    for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-                    const average = sum / bufferLength;
-                    setBlowLevel(average);
-
-                    if (average > 80 && !blown) {
-                        setBlown(true);
-                        playAudio('blow.mp3');
-                        setTimeout(() => onComplete(), 3000);
-                    } else if (!blown) {
-                        animationFrame = requestAnimationFrame(checkBlow);
-                    }
-                };
-                checkBlow();
-            } catch (err) {
-                console.log("Mic access denied or error:", err);
-                // We fallback gracefully, user can just click the cake
-            }
-        };
-        initMic();
-
-        return () => {
-            if (animationFrame) cancelAnimationFrame(animationFrame);
-            if (audioContext) audioContext.close();
-        };
-    }, [blown, onComplete]);
-
-    const manualBlow = () => {
-        if (blown) return;
-        setBlown(true);
-        playAudio('blow.mp3');
-        setTimeout(() => onComplete(), 3000);
-    };
-
-    return (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center justify-center space-y-12 w-full max-w-lg px-6 relative z-10">
-            <h2 className="text-5xl font-playfair text-white text-center drop-shadow-lg leading-tight">
-                {blown ? "Make a Wish! ✨" : (micEnabled ? "Tiup lilinnya!" : "Ketuk lilinnya untuk meniup!")}
-            </h2>
-            
-            <div className="relative cursor-pointer" onClick={manualBlow}>
-                {/* Simple SVG Cake */}
-                <svg width="200" height="200" viewBox="0 0 200 200" className="drop-shadow-2xl">
-                    {/* Cake Base */}
-                    <rect x="30" y="100" width="140" height="70" rx="10" fill="#fcd34d" />
-                    <rect x="20" y="90" width="160" height="20" rx="10" fill="#f472b6" />
-                    <path d="M 30,120 Q 50,140 70,120 T 110,120 T 150,120 T 170,120" fill="none" stroke="#f472b6" strokeWidth="8" strokeLinecap="round" />
-                    
-                    {/* Candle */}
-                    <rect x="95" y="40" width="10" height="50" rx="2" fill="#e2e8f0" />
-                    <rect x="95" y="45" width="10" height="5" fill="#ef4444" />
-                    <rect x="95" y="60" width="10" height="5" fill="#ef4444" />
-                    <rect x="95" y="75" width="10" height="5" fill="#ef4444" />
-
-                    {/* Flame */}
-                    <AnimatePresence>
-                        {!blown && (
-                            <motion.path 
-                                initial={{ scale: 1 }}
-                                animate={{ scale: [1, 1.2, 0.9, 1.1, 1], rotate: [0, -5, 5, -2, 0] }}
-                                transition={{ repeat: Infinity, duration: 0.5, ease: "easeInOut" }}
-                                exit={{ scale: 0, opacity: 0 }}
-                                d="M 100,10 C 110,25 115,35 100,40 C 85,35 90,25 100,10 Z" 
-                                fill="#fbbf24" 
-                            />
-                        )}
-                    </AnimatePresence>
-                </svg>
-
-                {/* Confetti if blown */}
-                <AnimatePresence>
-                    {blown && (
-                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                            <Sparkles className="w-24 h-24 text-yellow-400 animate-pulse drop-shadow-[0_0_20px_rgba(250,204,21,0.8)]" />
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-
-                {/* Mic Indicator */}
-                {!blown && micEnabled && (
-                    <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-white/50 text-sm font-mono flex items-center gap-2">
-                        Mic: <div className="h-2 w-20 bg-white/10 rounded-full overflow-hidden"><div className="h-full bg-red-400" style={{ width: `${Math.min(100, blowLevel)}%` }} /></div>
-                    </div>
-                )}
-            </div>
-        </motion.div>
-    );
-};
-
-// --- Step 5: Typewriter ---
+// --- Step 4: Typewriter ---
 const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
     const text = "Happy Birthday!!!!";
     const [displayedText, setDisplayedText] = useState("");
@@ -354,8 +242,7 @@ export default function InteractionFlow({ onFlowComplete }: { onFlowComplete: ()
                 {step === 1 && <LoveModeStep key="step1" onComplete={() => setStep(2)} />}
                 {step === 2 && <TicTacToeStep key="step2" onComplete={() => setStep(3)} />}
                 {step === 3 && <LoveMeterStep key="step3" onComplete={() => setStep(4)} />}
-                {step === 4 && <CakeStep key="step4" onComplete={() => setStep(5)} />}
-                {step === 5 && <TypewriterStep key="step5" onComplete={() => onFlowComplete()} />}
+                {step === 4 && <TypewriterStep key="step4" onComplete={() => onFlowComplete()} />}
             </AnimatePresence>
 
             <div className="absolute -top-24 -left-24 w-96 h-96 bg-red-900/20 blur-[100px] rounded-full" />
