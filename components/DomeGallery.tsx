@@ -691,6 +691,13 @@ export default function DomeGallery({
         isFlipped = !isFlipped;
         flipper.style.transform = isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)';
         
+        // Play flip sound
+        try {
+          const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
+          audio.volume = 0.2;
+          audio.play().catch(() => {});
+        } catch(e) {}
+
         // Hide romantic labels when flipped
         viewerRef.current?.querySelectorAll('.romantic-label').forEach(label => {
             (label as HTMLElement).style.opacity = isFlipped ? '0' : '1';
@@ -759,6 +766,13 @@ export default function DomeGallery({
 
     viewerRef.current?.appendChild(labelLeft);
     viewerRef.current?.appendChild(labelRight);
+
+    // Play open sound
+    try {
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3');
+      audio.volume = 0.3;
+      audio.play().catch(() => {});
+    } catch(e) {}
 
     const checkAndShowLabels = () => {
       if (rootRef.current?.getAttribute('data-enlarging') === 'true') {

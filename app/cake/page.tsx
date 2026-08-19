@@ -66,12 +66,17 @@ export default function CakePage() {
     try {
       const audio = new Audio('/sfx/blow.mp3');
       audio.volume = 0.6;
-      audio.play().catch(e => {
+      audio.play().catch(() => {
         const fallback = new Audio('https://assets.mixkit.co/active_storage/sfx/2561/2561-preview.mp3');
         fallback.volume = 0.3;
         fallback.play().catch(() => {});
       });
-    } catch (e) {}
+
+      // Play Happy Birthday music (short)
+      const hbd = new Audio('https://cdn.pixabay.com/audio/2022/03/15/audio_731454c0e6.mp3?filename=happy-birthday-155461.mp3');
+      hbd.volume = 0.5;
+      hbd.play().catch(() => {});
+    } catch { }
 
     // Confetti effect
     const duration = 3 * 1000;
@@ -121,82 +126,66 @@ export default function CakePage() {
         </div>
 
         {/* The Cake - Responsive Scale */}
-        <div className="relative cursor-pointer scale-[0.8] md:scale-100" onClick={handleBlowOut}>
-          <svg width="300" height="400" viewBox="0 0 300 400" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-2xl overflow-visible">
+        <div className="relative cursor-pointer scale-[0.8] md:scale-110 group" onClick={() => {
+          if (!blown) {
+            try {
+              new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3').play().catch(() => {});
+            } catch(e) {}
+            handleBlowOut();
+          }
+        }}>
+          <div className="absolute inset-0 bg-red-500/20 blur-[100px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
+          
+          <svg width="320" height="420" viewBox="0 0 320 420" fill="none" xmlns="http://www.w3.org/2000/svg" className="drop-shadow-2xl overflow-visible relative z-10">
             {/* Plate */}
-            <ellipse cx="150" cy="350" rx="140" ry="30" fill="#2d1a1a" />
-            <ellipse cx="150" cy="345" rx="130" ry="25" fill="#3d2b2b" />
+            <ellipse cx="160" cy="360" rx="150" ry="35" fill="#2d1a1a" />
+            <ellipse cx="160" cy="355" rx="140" ry="30" fill="#3d2b2b" />
 
             {/* Bottom Layer */}
-            <path d="M40 330 C40 360, 260 360, 260 330 L260 250 C260 280, 40 280, 40 250 Z" fill="#ff9999" />
-            <ellipse cx="150" cy="250" rx="110" ry="25" fill="#ffb3b3" />
+            <path d="M40 340 C40 375, 280 375, 280 340 L280 260 C280 295, 40 295, 40 260 Z" fill="#ff9999" />
+            <ellipse cx="160" cy="260" rx="120" ry="30" fill="#ffb3b3" />
             
             {/* Middle Layer */}
-            <path d="M60 250 C60 275, 240 275, 240 250 L240 180 C240 205, 60 205, 60 180 Z" fill="#ff708a" />
-            <ellipse cx="150" cy="180" rx="90" ry="20" fill="#ff85a2" />
+            <path d="M60 260 C60 290, 260 290, 260 260 L260 190 C260 220, 60 220, 60 190 Z" fill="#ff708a" />
+            <ellipse cx="160" cy="190" rx="100" ry="25" fill="#ff85a2" />
 
             {/* Top Layer */}
-            <path d="M85 180 C85 200, 215 200, 215 180 L215 120 C215 140, 85 140, 85 120 Z" fill="#fffaf0" />
-            <ellipse cx="150" cy="120" rx="65" ry="15" fill="#ffffff" />
+            <path d="M85 190 C85 215, 235 215, 235 190 L235 130 C235 155, 85 155, 85 130 Z" fill="#fffaf0" />
+            <ellipse cx="160" cy="130" rx="75" ry="20" fill="#ffffff" />
 
             {/* Premium Drips */}
-            <path d="M85 120 Q100 150 115 120 Q130 160 150 120 Q170 155 190 120 Q205 140 215 120" fill="#ffffff" />
-            <path d="M60 180 Q80 210 100 180 Q120 220 150 180 Q180 215 210 180 Q225 205 240 180" fill="#ff85a2" opacity="0.6" />
+            <path d="M85 130 Q105 165 125 130 Q145 175 165 130 Q185 170 215 130 Q225 150 235 130" fill="#ffffff" />
+            <path d="M60 190 Q85 225 110 190 Q135 235 165 190 Q195 230 230 190 Q245 215 260 190" fill="#ff85a2" opacity="0.6" />
 
-            {/* Candles */}
-            <g transform="translate(110, 60)">
-              <rect x="0" y="20" width="10" height="40" rx="2" fill="#ffccd5" />
-              <line x1="5" y1="20" x2="5" y2="15" stroke="#444" strokeWidth="1" />
-              <AnimatePresence>
-                {!blown && (
-                  <motion.path
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.2, 1], rotate: [0, -5, 5, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.5 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    d="M5 15 C 5 15, 0 10, 5 0 C 10 10, 5 15, 5 15 Z"
-                    fill="#ffaa00"
-                    className="drop-shadow-[0_0_8px_rgba(255,170,0,0.8)]"
-                  />
-                )}
-              </AnimatePresence>
-            </g>
-
-            <g transform="translate(145, 50)">
-              <rect x="0" y="20" width="10" height="45" rx="2" fill="#ffb3c1" />
-              <line x1="5" y1="20" x2="5" y2="15" stroke="#444" strokeWidth="1" />
-              <AnimatePresence>
-                {!blown && (
-                  <motion.path
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.3, 1], rotate: [0, 5, -5, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.6 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    d="M5 15 C 5 15, 0 10, 5 0 C 10 10, 5 15, 5 15 Z"
-                    fill="#ffaa00"
-                    className="drop-shadow-[0_0_8px_rgba(255,170,0,0.8)]"
-                  />
-                )}
-              </AnimatePresence>
-            </g>
-
-            <g transform="translate(180, 65)">
-              <rect x="0" y="20" width="10" height="35" rx="2" fill="#ffccd5" />
-              <line x1="5" y1="20" x2="5" y2="15" stroke="#444" strokeWidth="1" />
-              <AnimatePresence>
-                {!blown && (
-                  <motion.path
-                    initial={{ scale: 1 }}
-                    animate={{ scale: [1, 1.1, 1], rotate: [0, -3, 3, 0] }}
-                    transition={{ repeat: Infinity, duration: 0.4 }}
-                    exit={{ scale: 0, opacity: 0 }}
-                    d="M5 15 C 5 15, 0 10, 5 0 C 10 10, 5 15, 5 15 Z"
-                    fill="#ffaa00"
-                    className="drop-shadow-[0_0_8px_rgba(255,170,0,0.8)]"
-                  />
-                )}
-              </AnimatePresence>
-            </g>
+            {/* Candles - Increased count and variety */}
+            {[
+              { x: 120, y: 70, h: 45, color: "#ffccd5", delay: 0 },
+              { x: 140, y: 55, h: 55, color: "#ffb3c1", delay: 0.2 },
+              { x: 165, y: 50, h: 60, color: "#ffccd5", delay: 0.4 },
+              { x: 190, y: 60, h: 50, color: "#ffb3c1", delay: 0.1 },
+              { x: 210, y: 80, h: 40, color: "#ffccd5", delay: 0.3 }
+            ].map((candle, i) => (
+              <g key={i} transform={`translate(${candle.x}, ${candle.y})`}>
+                <rect x="0" y="20" width="10" height={candle.h} rx="2" fill={candle.color} />
+                <line x1="5" y1="20" x2="5" y2="15" stroke="#444" strokeWidth="1" />
+                <AnimatePresence>
+                  {!blown && (
+                    <motion.path
+                      initial={{ scale: 1 }}
+                      animate={{ 
+                        scale: [1, 1.2 + Math.random() * 0.2, 1], 
+                        rotate: [0, -5 + Math.random() * 10, 5 - Math.random() * 10, 0] 
+                      }}
+                      transition={{ repeat: Infinity, duration: 0.4 + candle.delay }}
+                      exit={{ scale: 0, opacity: 0 }}
+                      d="M5 15 C 5 15, 0 10, 5 0 C 10 10, 5 15, 5 15 Z"
+                      fill="#ffaa00"
+                      className="drop-shadow-[0_0_12px_rgba(255,170,0,0.9)]"
+                    />
+                  )}
+                </AnimatePresence>
+              </g>
+            ))}
           </svg>
         </div>
 

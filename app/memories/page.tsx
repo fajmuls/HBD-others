@@ -4,10 +4,19 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Navigation from '@/components/Navigation';
 
-const images = Array.from({ length: 15 }, (_, i) => `/${i + 1}.jpeg`);
+const images = Array.from({ length: 17 }, (_, i) => `/${i + 1}.jpeg`);
 
 export default function MemoriesPage() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const handleImageClick = (src: string) => {
+    try {
+      const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+      audio.volume = 0.2;
+      audio.play().catch(() => {});
+    } catch (e) {}
+    setSelectedImage(src);
+  };
 
   return (
     <main className="min-h-screen bg-[#060010] text-white p-6 pb-32">
@@ -29,7 +38,7 @@ export default function MemoriesPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
               className="break-inside-avoid relative group cursor-pointer overflow-hidden rounded-xl border border-white/10"
-              onClick={() => setSelectedImage(src)}
+              onClick={() => handleImageClick(src)}
             >
               <img 
                 src={src} 

@@ -31,6 +31,8 @@ export default function Home() {
     { src: '/13.jpeg', message: "Waktu seakan berhenti." },
     { src: '/14.jpeg', message: "Hanya kita berdua." },
     { src: '/15.jpeg', message: "I love you. Always." },
+    { src: '/16.jpeg', message: "Momen spesial yang tak terlupakan." },
+    { src: '/17.jpeg', message: "Masa depan cerah menanti kita." },
   ];
 
   return (

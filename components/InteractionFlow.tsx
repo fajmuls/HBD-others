@@ -28,18 +28,13 @@ const playAudio = (path: string) => {
 
 // --- Background Particles ---
 const BackgroundHearts = () => {
-    const [hearts, setHearts] = useState<{id: number, x: string, duration: number, delay: number}[]>([]);
+    const [hearts] = useState(() => [...Array(10)].map((_, i) => ({
+        id: i,
+        x: `${(i * 10) + Math.random() * 5}%`,
+        duration: 15 + Math.random() * 10,
+        delay: i * 2
+    })));
     
-    useEffect(() => {
-        const initialHearts = [...Array(10)].map((_, i) => ({
-            id: i,
-            x: `${(i * 10) + Math.random() * 5}%`,
-            duration: 15 + Math.random() * 10,
-            delay: i * 2
-        }));
-        setHearts(initialHearts);
-    }, []);
-
     if (hearts.length === 0) return null;
     return (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -80,7 +75,10 @@ const LoveModeStep = ({ onComplete }: { onComplete: () => void }) => {
                 </div>
                 <div className="flex flex-col items-center space-y-6">
                     <span className={`text-3xl md:text-5xl font-playfair transition-colors duration-1000 ${isOn ? 'text-white' : 'text-white/40'}`}>Love mode</span>
-                    <button onClick={() => setIsOn(!isOn)} className={`group relative w-24 h-12 md:w-32 md:h-16 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] p-1.5 focus:outline-none ${isOn ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]' : 'bg-white/10'}`}>
+                    <button onClick={() => {
+                        playAudio('click.mp3');
+                        setIsOn(!isOn);
+                    }} className={`group relative w-24 h-12 md:w-32 md:h-16 rounded-full transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] p-1.5 focus:outline-none ${isOn ? 'bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]' : 'bg-white/10'}`}>
                         <motion.div animate={{ x: isOn ? (window.innerWidth < 768 ? 48 : 64) : 0 }} transition={{ type: "spring", stiffness: 400, damping: 30 }} className="w-9 h-9 md:w-13 md:h-13 bg-white rounded-full shadow-[0_4px_10px_rgba(0,0,0,0.2)] flex items-center justify-center pointer-events-none" style={{ width: 'calc(100% / 2.5)', height: '100%' }}>
                             <Heart size={18} className={`md:size-24 transition-colors duration-500 ${isOn ? "text-red-500 fill-red-500" : "text-gray-300"}`} />
                         </motion.div>
@@ -243,7 +241,7 @@ const LoveMeterStep = ({ onComplete }: { onComplete: () => void }) => {
 
 // --- Step 4: Typewriter ---
 const TypewriterStep = ({ onComplete }: { onComplete: () => void }) => {
-    const text = "Happy Birthday Kak Arey";
+    const text = "Happy Birthday Kak Arey Kuu!!!!";
     const [displayedText, setDisplayedText] = useState("");
     const [isDeleting, setIsDeleting] = useState(false);
 

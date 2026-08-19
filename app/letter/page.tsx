@@ -20,29 +20,29 @@ const playPageFlip = () => {
 
 const pages = [
   {
-    title: "Untuk Kamu,",
-    content: "Hai... Aku tahu mungkin ini terlihat sederhana, tapi aku membuatkan ini khusus untukmu. Sebuah tempat kecil di mana kita bisa menyimpan memori.",
+    title: "Happy Birthday, Arya Rizki Munandar!",
+    content: "jujur ya, kalau ada mesin waktu yang bisa lempar aku balik ke masa-masa SMA dulu, aku pasti bakal ketawa paling keras kalau ada yang bilang kita bakal sampai di titik ini. dulu ngelihat kamu aja bawaannya udah pengen ngomel (sebel maksimallll T____T). kamu itu berisik, jahil, dan bener-bener cowoo yang masuk daftar “orang yang nggak akan pernah aku suka” hahahah asli :p.",
     polaroids: [
       { src: "/1.jpeg", position: "bottom-4 right-[-10px] md:right-[-20px]", rotation: "rotate-[8deg]" }
     ]
   },
   {
-    title: "Cerita Kita",
-    content: "Setiap baris kode di sini ditulis dengan memikirkanmu. Lucu ya, bagaimana teknologi bisa menjadi cara lain untuk mengekspresikan perasaan.",
+    title: "Semesta Bercanda...",
+    content: "tapi entah gimana caranya semesta bercanda, cowo yang selama ini paling bikin sebel sekarang malah jadi orang yang favorite buat aku, yang punya tempat paling hangat dan spesial di hati akuu :3♥️\n\nperjuangan kamu yang pantang menyerah buat luluhin hati akuu yang super duperr keras bener-bener bikin aku tersadar betapa beruntungnya aku punya kamuuuuu huhu. makaasi banyak ya, Arey sayang. makaasii udah sabar banget hadapin semua gengsiku, udah tulus dari awal, dan ngebuktiin kalau niat baik kamu itu nyata sampai akhirnya bikin aku ikutan jatuh cinta sejauh ini…. T___T",
     polaroids: [
       { src: "/2.jpeg", position: "bottom-4 left-[-10px] md:left-[-20px]", rotation: "-rotate-[6deg]" }
     ]
   },
   {
-    title: "Pengingat",
-    content: "Meski mungkin kadang kita sibuk, aku harap tempat kecil ini bisa jadi pengingat: betapa kamu berarti buatku.",
+    title: "Doa & Harapanku",
+    content: "semoga kamu selalu sehat, bahagia, dan dilindungi di mana pun kamu berada. semoga jalan kuliah kamu makin lancar, jalan menuju karir impian kamu dimudahkan banget, dan semua mimpi besar serta wishlist yang kamu susun diam-diam bisa terwujud satu per satu. semoga segala niat baik dan usaha keras kamu selalu dibalas dengan kebaikan yang melimpah. terus satu lagi, kurangi atau jangan ngerokok lagi yaa, semoga kamu bisa terus berubah jadi lebih baik setiap harinya. dan pastinya, semoga di setiap langkah menuju masa depan nanti, kita bisa terus saling genggam tangan, saling dukung, tumbuh bareng, dan laluin semuanya bareng-bareng terus tanpa ada yang dilepas.\n\nselamat ulang tahun ya, arey sayang <333",
     polaroids: [
       { src: "/3.jpeg", position: "bottom-8 right-[-15px] md:right-[-30px]", rotation: "rotate-[12deg]" }
     ]
   },
   {
-    title: "Selamanya",
-    content: "Semoga hari-harimu selalu dipenuhi kebahagiaan. Kamu selalu memiliki tempat spesial di hatiku.\n\nLove ❤️",
+    title: "Teman Hidup",
+    content: "🎵 Tulus – Teman Hidup\njujurr tiap dengerin lagu ini, aku pasti langsung kepikiran kamu, Arey. semua liriknya aku ngerasa \"kita banget\"\n\n\"Bila di depan nanti banyak cobaan kisah cinta kita\nJangan cepat menyerah\nKau punya aku, ku punya kamu...\"\n\nini sih harapan aku banget buat kita. nanti di depan pasti bakal ada aja ujian atau capeknya, tapi inget yaa... kita jangan gampang nyerah. kamuu tetep punya aku, dan aku punya kamu buat saling jagain bareng-bareng terus yaaaaa <33 !!",
     polaroids: [
       { src: "/4.jpeg", position: "bottom-12 left-[-15px] md:left-[-30px]", rotation: "-rotate-[10deg]" },
       { src: "/5.jpeg", position: "bottom-4 right-[-10px] md:right-[-20px]", rotation: "rotate-[5deg]" }
@@ -54,10 +54,16 @@ export default function LetterPage() {
   const [currentPage, setCurrentPage] = useState(0);
 
   const next = () => {
+    try {
+      new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3').play().catch(() => {});
+    } catch { }
     playPageFlip();
     setCurrentPage(p => Math.min(pages.length - 1, p + 1));
   };
   const prev = () => {
+    try {
+      new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3').play().catch(() => {});
+    } catch { }
     playPageFlip();
     setCurrentPage(p => Math.max(0, p - 1));
   };
@@ -87,8 +93,8 @@ export default function LetterPage() {
             {/* Lined Paper Effect */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.05]" style={{ background: 'repeating-linear-gradient(transparent, transparent 31px, #333 32px)' }} />
 
-            <h2 className="text-xl md:text-3xl font-playfair font-bold text-[#4a2c16] mb-4 relative z-10 border-b border-[#4a2c16]/10 pb-2 italic">{pages[currentPage].title}</h2>
-            <p className="text-base md:text-lg font-serif leading-relaxed md:leading-loose text-gray-700 whitespace-pre-wrap relative z-10 flex-grow">
+            <h2 className="text-xl md:text-3xl font-playfair font-bold text-[#4a2c16] mb-4 relative z-10 border-b border-[#4a2c16]/10 pb-2 italic leading-tight">{pages[currentPage].title}</h2>
+            <p className="text-[13px] sm:text-base md:text-lg font-serif leading-relaxed sm:leading-loose text-gray-700 whitespace-pre-wrap relative z-10 flex-grow">
                 {pages[currentPage].content}
             </p>
             
